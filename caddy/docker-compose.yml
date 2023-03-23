@@ -1,0 +1,18 @@
+version: "latest"
+
+services:
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "81:81"
+      - "443:443"
+    volumes:
+      - ../caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ../front/.output:/srv
+      - data:/data
+      - config:/config
+
+volumes:
+  data:
+  config:
