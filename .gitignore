@@ -1,1 +1,3 @@
-backend/node_modules
+rh.backend/node_modules
+rh.backend/package-lock.json
+rh.db/db

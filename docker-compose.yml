@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+
+  backend:
+    container_name: backend
+    build: 
+      context: ./rh.backend/
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "81:81"
+      - "443:443"
+    volumes:
+      - './rh.caddy/Caddyfile:/etc/caddy/Caddyfile'
+      - './rh.front/:/srv'
+
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - './rh.db:/var/lib/mysql'
+
+
+  adminer:
+    build:
+      context: ./rh.dbviewer/
+      dockerfile: dockerFile
+    restart: unless-stopped
+    ports:
+      - 8081:8080
