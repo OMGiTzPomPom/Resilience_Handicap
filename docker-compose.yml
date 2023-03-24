@@ -5,7 +5,7 @@ services:
   backend:
     container_name: backend
     build: 
-      context: ./rh.backend/
+      context: ./rh.backend
       dockerfile: Dockerfile
     ports:
       - 3300:3300
@@ -29,7 +29,7 @@ services:
       MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - './rh.db:/var/lib/mysql'
+      - './rh.db:/db'
 
 
   adminer:
