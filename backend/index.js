@@ -1,5 +1,7 @@
+// npm install express
 const express = require('express')
 const app = express()
+// npm install mysql2
 const mysql = require('mysql2/promise')
 
 app.use(express.json())
