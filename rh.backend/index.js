@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 // npm install mysql2
-const mysql = require('mysql2/promise')
+const mysql = require('mysql2')
 
 app.use(express.json())
  
@@ -70,4 +70,4 @@ app.use((err, req, res, next) => {
   return
 })
 
-app.listen(3000)
+app.listen(3300)
