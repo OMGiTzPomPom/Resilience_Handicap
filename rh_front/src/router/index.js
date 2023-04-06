@@ -12,7 +12,7 @@ const router = createRouter({
                 path: '',
                 component: Wrapper,
                 children: [
-                        {path: '/', component: Register, name: 'Register'},
+                        {path: '', component: Register, name: 'Register'},
                 ]
             },
             /*

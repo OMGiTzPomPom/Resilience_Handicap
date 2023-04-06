@@ -2,11 +2,12 @@
     <div class="d-flex align-items-center justify-content-center vh-100">
         <div class="text-center">
             <h1 class="display-1 fw-bold">404</h1>
-            <p class="fs-3"><span class="text-danger">Opps!</span> Ressource introuvable .</p>
+            <p class="fs-3"><span class="text-danger">Opps!</span> Page not found.</p>
             <p class="lead">
-                La page que vous avez demandé n'existe pas <i class="fa-solid fa-face-frown-open"></i> .
+              We're fairly sure that page used to be here, but seems to have gone missing.<br />
+              We do apologise on it's behalf. <i class="fa-solid fa-face-frown-open"></i>
             </p>
-            <a href="/dashboard" class="btn btn-primary">Retour au dashboard</a>
+            <a href="/" class="btn btn-primary">Back to homepage</a>
         </div>
     </div>
 </template>

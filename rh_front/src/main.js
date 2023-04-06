@@ -1,13 +1,16 @@
 import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router'
-import monthYearSelector from "./store/monthYearSelector";
+
 
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 
 import './assets/scss/main.scss';
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+
 
 const ENV = import.meta.env;
 
@@ -17,6 +20,6 @@ axios.defaults.withCredentials = true;
 const app = createApp(App);
 
 app.use(router);
-app.use(monthYearSelector);
+app.use(ElementPlus);
 
 app.mount('#app');
