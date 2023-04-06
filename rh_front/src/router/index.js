@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
 import Wrapper from "../components/Wrapper.vue";
+import Users from "../views/Users.vue";
 import Register from "../views/Register.vue";
 import Http404 from "../pages/404.vue";
 
@@ -12,7 +13,8 @@ const router = createRouter({
                 path: '',
                 component: Wrapper,
                 children: [
-                        {path: '', component: Register, name: 'Register'},
+                        {path: '', component: Users, name: 'Users'},
+                        {path: '/register', component: Register, name: 'Register'},
                 ]
             },
             /*
