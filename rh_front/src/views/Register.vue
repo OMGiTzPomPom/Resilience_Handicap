@@ -15,7 +15,7 @@ const daysOfWeek = [...Array(7).keys()].map(day =>
 
 const form = reactive({
     firstName : "",
-    foreName : "",
+    lastname : "",
     ImmatriculationOne : "",
     ImmatriculationTwo : "",
     AuthorizedUntil : "",
@@ -56,18 +56,18 @@ onMounted(async () => {
                 </div>
 
                 <div class="form-group row">
-                    <label for="forename" class="col-4 mx-auto col-form-label"
-                    >Fore name<em class="required">*</em></label
+                    <label for="lastname" class="col-4 mx-auto col-form-label"
+                    >Last name<em class="required">*</em></label
                     >
                     <div class="col-4 mx-auto">
                         <input
-                            id="forename"
-                            name="forename"
+                            id="lastname"
+                            name="lastname"
                             placeholder="Jane"
                             type="text"
                             class="form-control"
                             required="required"
-                            v-model="form.foreName"
+                            v-model="form.lastname"
                         />
                     </div>
                 </div>
