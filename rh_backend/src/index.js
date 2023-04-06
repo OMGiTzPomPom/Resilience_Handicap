@@ -27,16 +27,16 @@ function emptyOrRows(rows) {
 }
 
 app.post('/register', async function (req, res) {
-    console.log(req.body.name)
+    const {firstName, lastName, } = req.body
     res.end()
 })
 
-app.post('/login', async function (req, res) {
+app.post('/login', async function (req, res, next) {
   console.log(req.body.name)
   res.end()
 })
 
-app.get('/get-parking', async function (req, res) {
+app.get('/get-parking', async function (req, res, next) {
   try {
     res.json({"parking_number": 21})
   } catch (err) {
@@ -45,7 +45,7 @@ app.get('/get-parking', async function (req, res) {
   }
 })
 
-app.get('/users', async function (req, res) {
+app.get('/users', async function (req, res, next) {
   try {
     const page = req.query.page ?? 1
     const offset = getOffset(page, listPerPage)
@@ -64,10 +64,12 @@ app.get('/users', async function (req, res) {
 })
 
 app.use((err, req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
   const statusCode = err.statusCode || 500
   console.error(err.message, err.stack)
   res.status(statusCode).json({ message: err.message })
-  return
 })
 
 app.listen(3300)

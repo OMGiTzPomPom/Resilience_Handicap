@@ -7,7 +7,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-          <router-link to="/users" class="nav-link">User</router-link>
+          <router-link to="/users" class="nav-link">Users</router-link>
           <router-link to="/register" class="nav-link">Register</router-link>
       </div>
     </div>

@@ -4,6 +4,20 @@ import {onMounted} from "vue";
 
 onMounted(async () => {
     console.log('toto');
+            const settings = {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            }
+        try {
+            const fetchResponse = await fetch("http://localhost:3300/users?page=1", settings);
+            const data = await fetchResponse.json();
+            console.log(data)
+            } catch (error) {
+            console.log(error);
+        }
 });
 </script>
 
