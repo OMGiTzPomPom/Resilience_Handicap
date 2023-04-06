@@ -27,7 +27,7 @@ services:
       - "443:443"
     volumes:
       - './rh_caddy/Caddyfile:/etc/caddy/Caddyfile'
-      - './rh_front/:/srv'
+      - './rh_front/dist/:/srv'
 
   backend:
     container_name: backend
