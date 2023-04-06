@@ -34,5 +34,7 @@ services:
     build: 
       context: ./rh_backend/
       dockerfile: Dockerfile
+    volumes:
+      - './rh_backend/api/:/var/www/app'
     ports:
       - "3300:3300"
