@@ -43,7 +43,7 @@ app.get('/users/total', async function (req, res, next) {
     const connection = await mysql.createConnection(db)
     const [rows, fields] = await connection.query(sql, [])
 
-    return res.json({"count": rows})
+    return res.json({"total": rows})
 
   } catch (err) {
     next(err)
