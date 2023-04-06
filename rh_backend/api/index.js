@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 // npm install mysql2
-const mysql = require('mysql2')
+const mysql = require('mysql2/promise')
 
 app.use(express.json())
  
@@ -12,22 +12,15 @@ const db = {
     host: "localhost",
     user: "root",
     password: "root",
-    database: "lpiotia2023_resilence_handicap",
+    database: "mydb",
 }
 
 function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage]
 }
 
-function emptyOrRows(rows) {
-  if (!rows) {
-    return []
-  }
-  return rows
-}
-
 app.post('/register', async function (req, res) {
-    const {firstName, lastName, } = req.body
+    const {firstName, lastName } = req.body
     res.end()
 })
 
@@ -40,7 +33,7 @@ app.get('/get-parking', async function (req, res) {
   try {
     res.json({"parking_number": 21})
   } catch (err) {
-    console.error(`Error: `, err)
+    console.error(err)
   }
 })
 
@@ -48,16 +41,15 @@ app.get('/users', async function (req, res) {
   try {
     const page = req.query.page ?? 1
     const offset = getOffset(page, listPerPage)
-    
-    const sql = `SELECT id, firstname, lastname FROM users LIMIT ${offset},${listPerPage}`
+    console.log(page, offset);
+    const sql = 'SELECT * FROM `users` LIMIT ?,?'
     const connection = await mysql.createConnection(db)
-    const [results, ] = await connection.execute(sql, params)
-    const data = emptyOrRows(results)
+    const [rows, fields] = await connection.execute(sql, [page, offset])
     const meta = {page}
-    res.json(data, meta)
+    return res.json(rows, meta)
 
   } catch (err) {
-    console.error(`Error: `, err)
+    console.error(err)
   }
 })
 
