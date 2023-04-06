@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT, 
     first_name VARCHAR (255), 
@@ -6,7 +7,7 @@ CREATE TABLE users (
     license_2 VARCHAR (7) NULL,
     is_disabled TINYINT (1),
     _days JSON,
-    util DATE,
+    until DATE,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
@@ -65,6 +66,7 @@ VALUES ("Adam", "Oumarov", "AD707Z0", "", 0, '{
     "Sunday": "c"
 }', "2024-12-28");
 
+DROP TABLE IF EXISTS parking;
 CREATE TABLE parking (
     _number CHAR (1),
     area CHAR (1) UNIQUE, 
