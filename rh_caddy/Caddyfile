@@ -1,4 +1,4 @@
 :81 {
-	root * /rh_front/dist/
+	root * /srv/dist
 	file_server
 }
