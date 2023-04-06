@@ -29,7 +29,7 @@ app.post('/register', async function (req, res, next) {
       const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
      
       const connection = await mysql.createConnection(db)
-      const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, disabled, days, until])
+      const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1.replace('-',''), license_2.replace('-',''), disabled, days, until])
       return res.json({"status": rows})
     } catch (error) {
       next(error)
