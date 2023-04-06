@@ -4,7 +4,7 @@ CREATE TABLE users (
     last_name VARCHAR (255),
     license_1 VARCHAR (7),
     license_2 VARCHAR (7) NULL,
-    is_disabled NUMBER(1),
+    is_disabled TINYINT (1),
     _days JSON,
     util DATE,
     PRIMARY KEY (id)
