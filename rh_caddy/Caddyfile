@@ -1,4 +1,4 @@
 :81 {
-	root * /srv/dist
+	root * /srv
 	file_server
 }
