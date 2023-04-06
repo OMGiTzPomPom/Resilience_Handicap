@@ -1,5 +1,5 @@
-cd /var/www/html/app/
-
-npm install
-
+cd /var/www/app/
+npm i
+npm i express
+npm i mysql2
 npm start
