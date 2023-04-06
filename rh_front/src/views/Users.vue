@@ -3,7 +3,7 @@
 import {onMounted} from "vue";
 
 onMounted(async () => {
-    console.log('toto');
+   let page = 1
             const settings = {
                 method: 'GET',
                 headers: {
@@ -12,8 +12,9 @@ onMounted(async () => {
                 }
             }
         try {
-            const fetchResponse = await fetch("http://localhost:3300/users?page=1", settings);
+            const fetchResponse = await fetch("http://localhost:3300/users?page=page", settings);
             const data = await fetchResponse.json();
+            # data = {"users":[], "page": 1}
             console.log(data)
             } catch (error) {
             console.log(error);
