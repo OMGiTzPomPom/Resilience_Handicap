@@ -19,22 +19,17 @@ function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage]
 }
 
-app.post('/register', async function (req, res) {
-    const {firstName, lastName } = req.body
-    res.end()
-})
-
-app.post('/login', async function (req, res) {
-  console.log(req.body.name)
-  res.end()
-})
-
-app.get('/get-parking', async function (req, res, next) {
-  try {
-    res.json({"parking_number": 21})
-  } catch (err) {
-    next(err)
-  }
+app.post('/register', async function (req, res, next) {
+    try {
+      const {first_name, last_name, license_1, license_2, disabled, days } = req.body
+      const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, disabled, days) VALUES (?,?,?,?,?,?)'
+     
+      const connection = await mysql.createConnection(db)
+      const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, disabled, days])
+      return res.json({"status": rows})
+    } catch (error) {
+      next(error)
+    }
 })
 
 app.get('/users', async function (req, res, next) {
@@ -47,14 +42,14 @@ app.get('/users', async function (req, res, next) {
     const [rows, fields] = await connection.execute(sql, [listPerPage])
     const meta = {"users":rows, page}
     console.log(rows, meta);
-    res.json(meta)
+    return res.json(meta)
 
   } catch (err) {
     next(err)
   }
 })
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');

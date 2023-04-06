@@ -26,6 +26,29 @@ const form = reactive({
 const registerVehicule = async () => {
     form.AuthorizedUntil = dayjs(form.AuthorizedUntil).format('YYYY-MM-DD');
     console.log(form);
+            const settings = {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                first_name: form.firstName,
+                last_name: form.lastName,
+                license_1: form.ImmatriculationOne,
+                license_2: form.ImmatriculationTwo,
+                disabled: form.isDisabled,
+                days: JSON.stringify(form.days)
+            })
+        }
+        try {
+            const fetchResponse = await fetch("http://localhost:3300/register", settings);
+            const data = await fetchResponse.json();
+            console.log(data)
+            
+        } catch (e) {
+            return e;
+        }
 }
 
 onMounted(async () => {
