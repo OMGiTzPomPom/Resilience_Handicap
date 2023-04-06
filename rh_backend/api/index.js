@@ -38,11 +38,8 @@ app.post('/register', async function (req, res, next) {
 
 app.get('/users/total', async function (req, res, next) {
   try {
-    const page = req.query.page ?? 1
-    const offset = getOffset(page, listPerPage)
 
     const sql = 'SELECT COUNT(users.id) FROM `users`'
-   
     const connection = await mysql.createConnection(db)
     const [rows, fields] = await connection.query(sql, [])
 
