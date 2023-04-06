@@ -38,7 +38,8 @@ const registerVehicule = async () => {
                 license_1: form.ImmatriculationOne,
                 license_2: form.ImmatriculationTwo,
                 disabled: form.isDisabled,
-                days: JSON.stringify(form.days)
+                days: JSON.stringify(form.days),
+                until: form.AuthorizedUntil,
             })
         }
         try {
