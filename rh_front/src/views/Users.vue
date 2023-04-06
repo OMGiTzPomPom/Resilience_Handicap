@@ -14,7 +14,6 @@ onMounted(async () => {
         try {
             const fetchResponse = await fetch("http://localhost:3300/users?page=page", settings);
             const data = await fetchResponse.json();
-            # data = {"users":[], "page": 1}
             console.log(data)
             } catch (error) {
             console.log(error);

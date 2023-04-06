@@ -1,5 +1,4 @@
 localhost {
 	root * /srv/
 	file_server
-	reverse_proxy :3300
 }
