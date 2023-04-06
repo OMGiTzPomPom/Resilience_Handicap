@@ -13,7 +13,7 @@ const router = createRouter({
                 path: '',
                 component: Wrapper,
                 children: [
-                        {path: '', component: Users, name: 'Users'},
+                        {path: '/users', component: Users, name: 'Users'},
                         {path: '/register', component: Register, name: 'Register'},
                 ]
             },

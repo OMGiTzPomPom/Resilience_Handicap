@@ -1,6 +1,10 @@
 <script setup>
 
+import {onMounted} from "vue";
 
+onMounted(async () => {
+    console.log('toto');
+});
 </script>
 
 <template class="text-center">
