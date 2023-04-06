@@ -21,11 +21,11 @@ function getOffset(currentPage = 1, listPerPage) {
 
 app.post('/register', async function (req, res, next) {
     try {
-      const {first_name, last_name, license_1, license_2, disabled, days } = req.body
-      const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, disabled, days) VALUES (?,?,?,?,?,?)'
+      const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
+      const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
      
       const connection = await mysql.createConnection(db)
-      const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, disabled, days])
+      const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, disabled, days, until])
       return res.json({"status": rows})
     } catch (error) {
       next(error)
