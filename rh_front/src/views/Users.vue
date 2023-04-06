@@ -1,8 +1,8 @@
 <script setup>
 
-import {onMounted} from "vue";
+import {onMounted, reactive} from "vue";
 
-let users = []
+let users = reactive([]);
 
 onMounted(async () => {
             const settings = {

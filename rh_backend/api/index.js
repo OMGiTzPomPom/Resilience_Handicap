@@ -36,6 +36,23 @@ app.post('/register', async function (req, res, next) {
     }
 })
 
+app.get('/users/total', async function (req, res, next) {
+  try {
+    const page = req.query.page ?? 1
+    const offset = getOffset(page, listPerPage)
+
+    const sql = 'SELECT COUNT(users.id) FROM `users`'
+   
+    const connection = await mysql.createConnection(db)
+    const [rows, fields] = await connection.query(sql, [])
+
+    return res.json({"count": rows})
+
+  } catch (err) {
+    next(err)
+  }
+})
+
 app.get('/users', async function (req, res, next) {
   try {
     const page = req.query.page ?? 1
@@ -45,9 +62,8 @@ app.get('/users', async function (req, res, next) {
    
     const connection = await mysql.createConnection(db)
     const [rows, fields] = await connection.query(sql, [offset, listPerPage])
-    const meta = {"users":rows, page}
-    console.log(rows, meta);
-    return res.json(meta)
+ 
+    return res.json({"users":rows, page})
 
   } catch (err) {
     next(err)
