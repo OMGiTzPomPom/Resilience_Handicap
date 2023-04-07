@@ -93,10 +93,6 @@ INSERT INTO parking (_number, area, taken_by)
 VALUES ("8", "a", NULL);
 INSERT INTO parking (_number, area, taken_by) 
 VALUES ("9", "a", NULL);
-INSERT INTO parking (_number, area, taken_by) 
-VALUES ("a", "a", NULL);
-INSERT INTO parking (_number, area, taken_by) 
-VALUES ("b", "a", NULL);
 
 INSERT INTO parking (_number, area, taken_by) 
 VALUES ("0", "b", NULL);
@@ -118,10 +114,6 @@ INSERT INTO parking (_number, area, taken_by)
 VALUES ("8", "b", NULL);
 INSERT INTO parking (_number, area, taken_by) 
 VALUES ("9", "b", NULL);
-INSERT INTO parking (_number, area, taken_by) 
-VALUES ("a", "b", NULL);
-INSERT INTO parking (_number, area, taken_by) 
-VALUES ("b", "b", NULL);
 
 INSERT INTO parking (_number, area, taken_by) 
 VALUES ("0", "c", NULL);
@@ -143,7 +135,3 @@ INSERT INTO parking (_number, area, taken_by)
 VALUES ("8", "c", NULL);
 INSERT INTO parking (_number, area, taken_by) 
 VALUES ("9", "c", NULL);
-INSERT INTO parking (_number, area, taken_by) 
-VALUES ("a", "c", NULL);
-INSERT INTO parking (_number, area, taken_by) 
-VALUES ("b", "c", NULL);
