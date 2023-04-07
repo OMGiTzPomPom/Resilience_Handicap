@@ -1,4 +1,3 @@
-cd /var/www/app/
 npm i
 npm i express
 npm i cors
