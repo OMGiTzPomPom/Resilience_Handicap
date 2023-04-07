@@ -23,6 +23,34 @@ function getOffset(currentPage = 1, listPerPage) {
   return (currentPage - 1) * [listPerPage]
 }
 
+//need to think about it !
+// app.post('/parking', async function (req, res, next) {
+//   try {
+//     const { _number, area } = req.body
+//     const {id} = req.params
+    
+//     const connection = await mysql.createConnection(db)
+//     const sql = 'INSERT INTO parking (_number, area, taken_by) VALUES (?,?,?)'
+
+//     const [rows, fields] = await connection.execute(sql, [])
+//     res.json(rows)
+//   } catch (err) {
+//     next(err, req, res)
+//   }
+// })
+
+app.get('/parking', async function (req, res, next) {
+  try {
+    const page = req.query.page ?? 1
+    const offset = getOffset(page, listPerPage)
+    const connection = await mysql.createConnection(db)
+    const sql = "SELECT _number, area, taken_by FROM `parking LIMIT ?,?"
+    const [rows, fields] = await connection.query(sql, [ offset, 9])
+    res.json({"parking":rows, page})
+  } catch (err) {
+    next(err, req, res)
+  }
+})
 
 app.post('/users', async function (req, res, next) {
     try {
