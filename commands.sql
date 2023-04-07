@@ -70,7 +70,7 @@ DROP TABLE IF EXISTS parking;
 CREATE TABLE parking (
     _number CHAR (1),
     area CHAR (1), 
-    taken_by INT(10) NULL
+    taken_by VARCHAR (7) UNIQUE NULL
 ) ENGINE=InnoDB;
 
 INSERT INTO parking (_number, area, taken_by) 
