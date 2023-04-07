@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydb
-      MYSQL_USER: root
+      MYSQL_USER: root2
       MYSQL_PASSWORD: root
     volumes:
       - './rh_db/:/var/lib/mysql'
