@@ -1,4 +1,4 @@
-npm i
+npm install
 npm i express
 npm i cors
 npm i mysql2
