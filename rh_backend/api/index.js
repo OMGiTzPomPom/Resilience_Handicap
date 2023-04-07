@@ -52,6 +52,11 @@ app.get('/users/total', async function (req, res, next) {
 
 app.get('/users', async function (req, res, next) {
   try {
+
+    const first_name = req.query.firstName ?? ""
+    const last_name = req.query.firstName ?? ""
+    const is_disabled = req.query.isDisabled ?? ""
+
     const page = req.query.page ?? 1
     const offset = getOffset(page, listPerPage)
 
@@ -61,6 +66,22 @@ app.get('/users', async function (req, res, next) {
     const [rows, fields] = await connection.query(sql, [offset, listPerPage])
  
     return res.json({"users":rows, page})
+
+  } catch (err) {
+    next(err)
+  }
+})
+
+app.get('/users/:id', async function (req, res, next) {
+  try {
+    const {id} = req.params
+  
+    const sql = 'SELECT id, first_name, last_name, until, is_disabled FROM `users` WHERE `id` = ?'
+   
+    const connection = await mysql.createConnection(db)
+    const [rows, fields] = await connection.execute(sql, [id])
+ 
+    return res.json({"user":rows})
 
   } catch (err) {
     next(err)
