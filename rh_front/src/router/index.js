@@ -4,6 +4,7 @@ import Wrapper from "../components/Wrapper.vue";
 import Users from "../views/Users.vue";
 import Register from "../views/Register.vue";
 import Http404 from "../pages/404.vue";
+import toHomepage from "../components/ToHomepage.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,8 +14,9 @@ const router = createRouter({
                 path: '',
                 component: Wrapper,
                 children: [
-                        {path: '/users', component: Users, name: 'Users'},
-                        {path: '/register', component: Register, name: 'Register'},
+                    {path: '', component: toHomepage},
+                    {path: '/users', component: Users, name: 'Users'},
+                    {path: '/register', component: Register, name: 'Register'},
                 ]
             },
             /*
