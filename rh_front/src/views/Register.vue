@@ -48,7 +48,7 @@ const registerVehicule = async () => {
             console.log(data)
             
         } catch (e) {
-            return e;
+            console.log(e);
         }
 }
 
@@ -91,7 +91,7 @@ onMounted(async () => {
                             type="text"
                             class="form-control"
                             required="required"
-                            v-model="form.lastname"
+                            v-model="form.lastName"
                         />
                     </div>
                 </div>
