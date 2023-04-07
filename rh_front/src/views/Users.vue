@@ -3,7 +3,12 @@
 import {onMounted, reactive} from "vue";
 import dayjs from "dayjs";
 
+import ViewUserModal from "@/components/modals/ViewUserModal.vue";
+
 let users = reactive([]);
+
+let jsonModal = reactive({});
+
 
 onMounted(async () => {
     const settings = {
@@ -47,11 +52,11 @@ onMounted(async () => {
                     </thead>
                     <tbody v-for="user in users" :key="user.id">
                         <tr>
-                            <td>{{ user.first_name }}</td>
-                            <td>{{ user.last_name }}</td>
-                            <td v-if="user.is_disabled == 1">Yes</td>
-                            <td v-else>No</td>
-                            <td>{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
+                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal">{{ user.first_name }}</td>
+                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal">{{ user.last_name }}</td>
+                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal" v-if="user.is_disabled == 1">Yes</td>
+                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal" v-else>No</td>
+                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal">{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
                             <td>
                                 <button type="button" class="btn btn-warning btn-sm">Modify</button>
                                 <button type="button" class="btn btn-danger btn-sm">Delete</button>
@@ -62,6 +67,10 @@ onMounted(async () => {
             </div>
         </div>
     </div>
+
+    <!--Modals-->
+
+    <ViewUserModal/>
 </template>
 
 <style scoped>
