@@ -7,6 +7,7 @@ const cors = require('cors');
 
 
 app.use(cors())
+app.use(express.urlencoded({extended: true}))
 app.use(express.json())
  
 const listPerPage = 24
@@ -26,36 +27,37 @@ function getOffset(currentPage = 1, listPerPage) {
 app.post('/users', async function (req, res, next) {
     try {
       const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
+      console.log(first_name, last_name, license_1, license_2, disabled, days, until);
       const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
       const connection = await mysql.createConnection(db)
-      const [rows, fields] = await connection.execute(sql, [first_name + "%", last_name + "%", license_1.replace('-',''), license_2.replace('-',''), disabled, days, until])
-      return res.json(rows[0])
+      const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, disabled, days, until])
+      res.json(rows)
     } catch (err) {
       next(err, req, res)
     }
 })
 
-app.put('/users:id', async function (req, res, next) {
+app.put('/users/:id', async function (req, res, next) {
   try {
     const {id} = req.params
     const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
-    const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `license_1` = ?, `license_2` = ?, `is_disabled` = ?, `_days` = ?, `until` WHERE `id` = ?'
-   
+    const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `license_1` = ?, `license_2` = ?, `is_disabled` = ?, `_days` = ?, `until` = ? WHERE `id` = ?'
+   console.log(first_name, last_name, license_1, license_2, disabled, days, until, id);
     const connection = await mysql.createConnection(db)
-    const [rows, fields] = await connection.execute(sql, [first_name + "%", last_name + "%", license_1.replace('-',''), license_2.replace('-',''), disabled, days, until, id])
-    return res.json(rows[0])
+    const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, disabled, days, until, id])
+    res.json(rows[0])
   } catch (err) {
     next(err, req, res)
   }
 })
 
-app.delete('/users:id', async function (req, res, next) {
+app.delete('/users/:id', async function (req, res, next) {
   try {
     const {id} = req.params
     const sql = 'DELETE FROM `users` WHERE `id` = ?'
     const connection = await mysql.createConnection(db)
     const [rows, fields] = await connection.execute(sql, [id])
-    return res.json(rows[0])
+    res.json(rows[0])
   } catch (err) {
     next(err, req, res)
   }
@@ -197,7 +199,7 @@ app.get('/users', async function (req, res, next) {
       const sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` LIKE ? LIMIT ?,?"
    
       
-      const [rows, fields] = await connection.query(sql, [license_1.replace('-','') + "%", offset, listPerPage])
+      const [rows, fields] = await connection.query(sql, [license_1 + "%", offset, listPerPage])
    
      res.json({"users":rows, page})
     }else     if(license_2 !== undefined){
@@ -205,7 +207,7 @@ app.get('/users', async function (req, res, next) {
       const sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_2` LIKE ? LIMIT ?,?"
    
       
-      const [rows, fields] = await connection.query(sql, [license_2.replace('-','') + "%", offset, listPerPage])
+      const [rows, fields] = await connection.query(sql, [license_2 + "%", offset, listPerPage])
    
      res.json({"users":rows, page})
     }else{
