@@ -15,7 +15,7 @@ const daysOfWeek = [...Array(7).keys()].map(day =>
 
 const form = reactive({
     firstName : "",
-    lastname : "",
+    lastName : "",
     ImmatriculationOne : "",
     ImmatriculationTwo : "",
     AuthorizedUntil : "",

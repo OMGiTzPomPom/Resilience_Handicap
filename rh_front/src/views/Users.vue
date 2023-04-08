@@ -1,43 +1,154 @@
 <script setup>
 
-import {onMounted, reactive} from "vue";
+import {ref, onMounted, reactive} from "vue";
 import dayjs from "dayjs";
 
 import ViewUserModal from "@/components/modals/ViewUserModal.vue";
 
 let users = reactive([]);
 
-let jsonModal = reactive({});
+const formSearch = reactive({
+    data : "",
+    isDisabled : false,
+})
 
-
-onMounted(async () => {
-    const settings = {
+let page = ref(1);
+let total = ref(0);
+const settingsGet = {
         method: 'GET',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
         }
     }
+
+onMounted(async () => {
+    page = ref(1);
+    total = ref(0);
     try {
-        const fetchResponse = await fetch("http://localhost:3300/users?page=1", settings);
+        const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
         const data = await fetchResponse.json();
+        total.value = data.total
+    } catch (error) {
+        console.log(error);
+    }
 
-        console.log(data)
-
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        
         data.users.forEach(el => {
             users.push(el)
         })
 
-        //users = data.users
-        //console.log(users)
     } catch (error) {
         console.log(error);
     }
+
 });
+
+const search = async (e) => {
+
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
+        const data = await fetchResponse.json();
+        
+        total.value = data.total
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        users = reactive([]);
+        page = ref(1);
+        return data.users.forEach(el => {
+            users.push(el)
+        })
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+const searchDisalbed = async (e) => {
+    if(formSearch.isDisabled === true)
+    {
+        try {
+      
+            const fetchResponse = await fetch(`http://localhost:3300/users/disabled/total`, settingsGet);
+            const data = await fetchResponse.json();
+            total.value = data.total
+        } catch (error) {
+            console.log(error);
+        }
+        try {
+            page = ref(1);
+            const fetchResponse = await fetch(`http://localhost:3300/users/disabled/${formSearch.isDisabled}/?page=${page.value}`, settingsGet);
+            const data = await fetchResponse.json();
+            users = reactive([]);
+            
+            return data.users.forEach(el => {
+                users.push(el)
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+}
+
+const previous = async (e) => {
+    if(page.value > 1){
+        page.value -= 1
+        try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        users = reactive([]);
+        data.users.forEach(el => {
+            users.push(el)
+        })
+        // you need to fix that to render immediately !
+        console.log(users);
+    } catch (error) {
+        console.log(error);
+    }
+    }
+}
+
+const next = async (e) => {
+    if(page.value < (total.value / 3)){
+        page.value += 1
+        try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        users = reactive([]);
+        data.users.forEach(el => {
+            users.push(el)
+        })
+        // you need to fix that to render immediately !
+        console.log(users);
+    } catch (error) {
+        console.log(error);
+    }
+    }
+}
 </script>
 
 <template>
     <div class="container">
+        <div class="row">
+            <nav class="navbab">
+            <div class="container">
+                <form class="" role="search">
+                     <input @input.prevent="search" v-model="formSearch.data" class="form-control" type="search" placeholder="Search" aria-label="Search">
+                     <input @check="searchDisalbed" v-model="formSearch.isDisabled" class="form-check-input" type="checkbox">
+                     <label class="form-check-label" for="flexCheckDefault">
+                        Disable
+                    </label>
+                </form>
+            </div>
+            </nav>
+        </div>
         <div class="row">
             <div class="col mx-auto">
                 <table class="table table-responsive table-striped mx-auto">
@@ -65,6 +176,16 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="row">
+            Page: {{ page }} of {{ (total / 3)  }}
+        </div>
+        <div class="row">
+            <div class="col">
+                <button @click="previous" type="button" class="btn btn-sm">previous</button>
+                <button @click="next" type="button" class="btn btn-sm">next</button>
+            </div>
+
         </div>
     </div>
 
