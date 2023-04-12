@@ -1,5 +1,2 @@
 npm install
-npm i express
-npm i cors
-npm i mysql2
 npm start

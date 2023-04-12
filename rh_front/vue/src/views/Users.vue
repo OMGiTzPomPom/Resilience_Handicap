@@ -103,7 +103,7 @@ const previous = async (e) => {
         try {
         const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
         const data = await fetchResponse.json();
-        users = reactive([]);
+        users.splice(0);
         data.users.forEach(el => {
             users.push(el)
         })
@@ -121,8 +121,8 @@ const next = async (e) => {
         try {
         const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
         const data = await fetchResponse.json();
-        users = reactive([]);
-        data.users.forEach(el => {
+          users.splice(0);
+          data.users.forEach(el => {
             users.push(el)
         })
         // you need to fix that to render immediately !
@@ -178,7 +178,7 @@ const next = async (e) => {
             </div>
         </div>
         <div class="row">
-            Page: {{ page }} of {{ (total / 3)  }}
+            Page: {{ page }} of {{ Math.round(total / 3)  }}
         </div>
         <div class="row">
             <div class="col">
