@@ -36,7 +36,7 @@ onMounted(async () => {
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users?search=${formSearch.data}&page=${page.value}`, settingsGet);
         const data = await fetchResponse.json();
-        
+        users.splice(0);
         data.users.forEach(el => {
             users.push(el)
         })
@@ -48,7 +48,7 @@ onMounted(async () => {
 });
 
 const search = async (e) => {
-
+    page = ref(1);
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
         const data = await fetchResponse.json();
@@ -60,7 +60,7 @@ const search = async (e) => {
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
         const data = await fetchResponse.json();
-        users = reactive([]);
+        users.splice(0);
         page = ref(1);
         return data.users.forEach(el => {
             users.push(el)
@@ -70,32 +70,7 @@ const search = async (e) => {
     }
 
 }
-const searchDisalbed = async (e) => {
-    if(formSearch.isDisabled === true)
-    {
-        try {
-      
-            const fetchResponse = await fetch(`http://localhost:3300/users/disabled/total`, settingsGet);
-            const data = await fetchResponse.json();
-            total.value = data.total
-        } catch (error) {
-            console.log(error);
-        }
-        try {
-            page = ref(1);
-            const fetchResponse = await fetch(`http://localhost:3300/users/disabled/${formSearch.isDisabled}/?page=${page.value}`, settingsGet);
-            const data = await fetchResponse.json();
-            users = reactive([]);
-            
-            return data.users.forEach(el => {
-                users.push(el)
-            })
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
-}
 
 const previous = async (e) => {
     if(page.value > 1){
@@ -141,10 +116,6 @@ const next = async (e) => {
             <div class="container">
                 <form class="" role="search">
                      <input @input.prevent="search" v-model="formSearch.data" class="form-control" type="search" placeholder="Search" aria-label="Search">
-                     <input @check="searchDisalbed" v-model="formSearch.isDisabled" class="form-check-input" type="checkbox">
-                     <label class="form-check-label" for="flexCheckDefault">
-                        Disable
-                    </label>
                 </form>
             </div>
             </nav>
@@ -178,7 +149,7 @@ const next = async (e) => {
             </div>
         </div>
         <div class="row">
-            Page: {{ page }} of {{ Math.round(total / 3)  }}
+            Page: {{ page }} of {{ (Math.round(total / 3) === 0) ? 1 : Math.round(total / 3)  }}
         </div>
         <div class="row">
             <div class="col">

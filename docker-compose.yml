@@ -18,7 +18,6 @@ services:
     ports:
       - 8081:8080
 
-
   caddy:
     image: caddy:latest
     restart: unless-stopped
@@ -32,9 +31,15 @@ services:
   backend:
     container_name: backend
     build: 
-      context: ./rh_backend/
+      context: ./rh_back/
       dockerfile: Dockerfile
     volumes:
-      - './rh_backend/:/var/www/app'
+      - './rh_back/:/var/www/app'
     ports:
-      - "3300:3300"
+      - 3300:3300
+
+  front:
+    container_name: frontend
+    build: 
+      context: ./rh_front/
+      dockerfile: Dockerfile

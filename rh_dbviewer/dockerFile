@@ -1,5 +1,5 @@
 FROM adminer
 
-ADD adminer.css /var/www/html/
+ADD adminer.css ./var/www/html/
 
 ENV ADMINER_DESIGN='hydra'
