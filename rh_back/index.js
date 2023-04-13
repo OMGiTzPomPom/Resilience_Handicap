@@ -4,6 +4,7 @@
           const swaggerUi = require('swagger-ui-express');
           const app = express()
 
+          app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
         
     
           
@@ -20,11 +21,7 @@
             return (currentPage - 1) * [listPerPage]
           }
 
-
-
-
-
-          app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+          
 
 
           // npm install mysql2
@@ -68,25 +65,6 @@
           // })
 
 
-          /**
-           * @openapi
-           * /:
-           *   post:
-           *     description: add user to database
-           *     @param {Object} user - User.
-           *     @param {string} user.first_name - First name of the user.
-           *     @param {string} user.last_name - Last name of the user.
-           *     @param {string} user.license_1 - First car license.
-           *     @param {string} user.license_2 - Second car license.
-           *     @param {Object} user - User.
-           *     @param {string} user.first_name - First name of the user.
-           *     @param {string} user.last_name - Last name of the user.
-           *     @param {string} user.license_1 - First car license.
-           *     @param {string} user.license_2 - Second car license.
-           *     responses:
-           *       200:
-           *         description: Returns a mysterious string.
-          */
           app.post('/users', async function (req, res, next) {
               try {
                 const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
@@ -125,7 +103,16 @@
             }
           })
 
-
+          /**
+           * @openapi
+           * /:
+           *   get:
+           *     description: Welcome to swagger-jsdoc!
+           *     produces: "application/json"   
+           *     responses:
+           *       200:
+           *         description: Returns array of users.
+           */
           app.get('/users', async function (req, res, next) {
             try {
               const page = req.query.page ?? 1

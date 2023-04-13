@@ -3,7 +3,7 @@ const options = {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'RH',
+        title: 'Documention RH',
         version: '1.0.0',
       },
     },
@@ -11,4 +11,4 @@ const options = {
   };
 
 
-exports.module = swaggerJsdoc(options);
+module.exports = swaggerJsdoc(options);
