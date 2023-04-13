@@ -1,3 +1,12 @@
+          
+          const express = require('express')
+          const swaggerDocument = require('./swagger.js');
+          const swaggerUi = require('swagger-ui-express');
+          const app = express()
+
+        
+    
+          
           const listPerPage = 3
 
           const db = {
@@ -12,9 +21,11 @@
           }
 
 
-          const express = require('express')
 
-          const app = express()
+
+
+          app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
           // npm install mysql2
           const mysql = require('mysql2/promise')
@@ -43,19 +54,39 @@
           //   }
           // })
 
-          app.get('/parking', async function (req, res, next) {
-            try {
-              const page = req.query.page ?? 1
-              const offset = getOffset(page, listPerPage)
-              const connection = await mysql.createConnection(db)
-              const sql = "SELECT _number, area, taken_by FROM `parking LIMIT ?,?"
-              const [rows, fields] = await connection.query(sql, [ offset, 9])
-              return res.json({"parking":rows, page})
-            } catch (err) {
-              next(err, req, res)
-            }
-          })
+          // app.get('/parking', async function (req, res, next) {
+          //   try {
+          //     const page = req.query.page ?? 1
+          //     const offset = getOffset(page, listPerPage)
+          //     const connection = await mysql.createConnection(db)
+          //     const sql = "SELECT _number, area, taken_by FROM `parking LIMIT ?,?"
+          //     const [rows, fields] = await connection.query(sql, [ offset, 9])
+          //     return res.json({"parking":rows, page})
+          //   } catch (err) {
+          //     next(err, req, res)
+          //   }
+          // })
 
+
+          /**
+           * @openapi
+           * /:
+           *   post:
+           *     description: add user to database
+           *     @param {Object} user - User.
+           *     @param {string} user.first_name - First name of the user.
+           *     @param {string} user.last_name - Last name of the user.
+           *     @param {string} user.license_1 - First car license.
+           *     @param {string} user.license_2 - Second car license.
+           *     @param {Object} user - User.
+           *     @param {string} user.first_name - First name of the user.
+           *     @param {string} user.last_name - Last name of the user.
+           *     @param {string} user.license_1 - First car license.
+           *     @param {string} user.license_2 - Second car license.
+           *     responses:
+           *       200:
+           *         description: Returns a mysterious string.
+          */
           app.post('/users', async function (req, res, next) {
               try {
                 const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
@@ -113,7 +144,7 @@
               const connection = await mysql.createConnection(db)
               let sql = "SELECT COUNT(users.id) AS total FROM `users`"
               let [rows, fields] = await connection.query(sql, [])
-              return res.json(rows[0])
+              return res.json(rows)
             } catch (err) {
               next(err, req, res)
             }
