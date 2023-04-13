@@ -17,25 +17,8 @@ const app = express()
 // npm install mysql2
 const mysql = require('mysql2/promise')
 const cors = require('cors');
-const swaggerTools = require('swagger-tools');
-const swaggerDoc = require('./swagger/swagger.json');
-// swaggerRouter configuration
-// const options = {
-//     controllers: './controllers',
-//     useStubs: process.env.NODE_ENV === 'development' ? true : false // Conditionally turn on stubs (mock mode)
-// };
 
-swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
-          app.use(middleware.swaggerMetadata());
-          
-          // Validate Swagger requests
-          app.use(middleware.swaggerValidator());
 
-          // Route validated requests to appropriate controller
-          // app.use(middleware.swaggerRouter(options));
-
-          // Serve the Swagger documents and Swagger UI
-          app.use(middleware.swaggerUi());
           app.use(cors())
           app.use(express.urlencoded({extended: true}))
           app.use(express.json())
@@ -212,5 +195,3 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
           })
 
           app.listen(3300)
-
-})
