@@ -145,6 +145,22 @@ const submitModif = async (id) => {
     }
 }
 
+const deleteUser = async (id) => {
+    const settings = {
+        method: 'DELETE',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+    }
+    try {
+        await fetch(`http://localhost:3300/user/${id}`, settings);
+        await location.reload();
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 onMounted(async () => {
     page = ref(1);
     total = ref(0);
@@ -204,7 +220,7 @@ onMounted(async () => {
                             <td>{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
                             <td>
                                 <button @click="getUser(user.id)" type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal">Modify</button>
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete</button>
+                                <button @click="getUser(user.id)" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -372,7 +388,7 @@ onMounted(async () => {
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
                     <button class="btn btn-danger" data-bs-dismiss="modal">Non</button>
-                    <button class="btn btn-success" data-bs-dismiss="modal">Oui</button>
+                    <button @click="deleteUser(jsonUser.id)" class="btn btn-success" data-bs-dismiss="modal">Oui</button>
                 </div>
             </div>
         </div>
