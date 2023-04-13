@@ -25,7 +25,9 @@ let jsonUser = reactive({
 });
 
 const formSearch = reactive({
-    data : "",
+    firstname : "",
+    lastname : "",
+    license : "",
     isDisabled : false,
 })
 
@@ -40,18 +42,64 @@ const settingsGet = {
     }
 }
 
-const search = async (e) => {
+const searchByFirstName = async (e) => {
     page = ref(1);
     try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
+        const fetchResponse = await fetch(`http://localhost:3300/users/first_name/total/${formSearch.firstname}`, settingsGet);
         const data = await fetchResponse.json();
-        
+
         total.value = data.total
     } catch (error) {
         console.log(error);
     }
     try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const fetchResponse = await fetch(`http://localhost:3300/users/first_name/${formSearch.firstname}/?page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        users.splice(0);
+        page = ref(1);
+        return data.users.forEach(el => {
+            users.push(el)
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const searchByLasttName = async (e) => {
+    page = ref(1);
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/last_name/total/${formSearch.lastname}`, settingsGet);
+        const data = await fetchResponse.json();
+
+        total.value = data.total
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/last_name/${formSearch.lastname}/?page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        users.splice(0);
+        page = ref(1);
+        return data.users.forEach(el => {
+            users.push(el)
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const searchByLicense = async (e) => {
+    page = ref(1);
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/user/license/total/${formSearch.license}`, settingsGet);
+        const data = await fetchResponse.json();
+
+        total.value = data.total
+    } catch (error) {
+        console.log(error);
+    }
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/user/license/${formSearch.license}`, settingsGet);
         const data = await fetchResponse.json();
         users.splice(0);
         page = ref(1);
@@ -167,7 +215,7 @@ onMounted(async () => {
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
         const data = await fetchResponse.json();
-        total.value = data.total
+        total.value = data[0].total
     } catch (error) {
         console.log(error);
     }
@@ -196,20 +244,20 @@ onMounted(async () => {
                 <div class="row">
                     <div class="col">
                         <form class="" role="search">
-                            <h5>Seach by First Name</h5>
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                            <h5>Search by First Name</h5>
+                            <input @input.prevent="searchByFirstName" v-model="formSearch.firstname" class="form-control" type="search" placeholder="Search by First Name" aria-label="Search">
                         </form>
                     </div>
                     <div class="col">
                         <form class="" role="search">
-                            <h5>Seach by Last Name</h5>
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                            <h5>Search by Last Name</h5>
+                            <input @input.prevent="searchByLasttName" v-model="formSearch.lastname" class="form-control" type="search" placeholder="Search by Last Name" aria-label="Search">
                         </form>
                     </div>
                     <div class="col">
                     <form class="" role="search">
-                        <h5>Seach by License</h5>
-                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                        <h5>Search by License</h5>
+                        <input @input.prevent="searchByLicense" v-model="formSearch.license" class="form-control" type="search" placeholder="Search by License" aria-label="Search">
                     </form>
                 </div>
                 </div>
