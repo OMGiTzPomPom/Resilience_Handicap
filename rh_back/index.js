@@ -1,22 +1,24 @@
-const listPerPage = 3
+          const listPerPage = 3
 
-const db = {
-    host: "db",
-    user: "root",
-    password: "root",
-    database: "mydb",
-}
+          const db = {
+              host: "db",
+              user: "root",
+              password: "root",
+              database: "mydb",
+          }
 
-function getOffset(currentPage = 1, listPerPage) {
-  return (currentPage - 1) * [listPerPage]
-}
+          function getOffset(currentPage = 1, listPerPage) {
+            return (currentPage - 1) * [listPerPage]
+          }
 
 
-const express = require('express')
-const app = express()
-// npm install mysql2
-const mysql = require('mysql2/promise')
-const cors = require('cors');
+          const express = require('express')
+
+          const app = express()
+
+          // npm install mysql2
+          const mysql = require('mysql2/promise')
+          const cors = require('cors');
 
 
           app.use(cors())
@@ -66,7 +68,7 @@ const cors = require('cors');
               }
           })
 
-          app.put('/users/:id', async function (req, res, next) {
+          app.put('/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
               const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
@@ -80,40 +82,13 @@ const cors = require('cors');
             }
           })
 
-          app.delete('/users/:id', async function (req, res, next) {
+          app.delete('/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
               const sql = 'DELETE FROM `users` WHERE `id` = ?'
               const connection = await mysql.createConnection(db)
               const [rows, fields] = await connection.execute(sql, [id])
               return res.json(rows[0])
-            } catch (err) {
-              next(err, req, res)
-            }
-          })
-
-          app.get('/users/total', async function (req, res, next) {
-            try {
-              const connection = await mysql.createConnection(db)
-              const search = req.query.search ?? undefined
-          
-              if(search === undefined || (typeof search === "string" && search === "")){
-                let sql = "SELECT COUNT(users.id) AS total FROM `users`"
-                let [rows, fields] = await connection.query(sql, [])
-                return res.json(rows[0])
-              }
-              let sql2 = "SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ?"
-
-              let sql3 = "SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ?"
-              let [rows3, fields3] = await connection.query(sql3, [search + "%"])
-              if(rows3[0]){
-                return res.json(rows3[0])
-              }
-              let sql4 = "SELECT COUNT(users.id) AS total FROM `users` WHERE `license_1` LIKE ? OR `license_2` LIKE ?"
-              let [rows4, fields4] = await connection.query(sql4, [search + "%"])
-              if(rows4[0]){
-                return res.json(rows4[0])
-              }
             } catch (err) {
               next(err, req, res)
             }
@@ -128,6 +103,17 @@ const cors = require('cors');
               let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` LIMIT ?,?"
               let [rows, fields] = await connection.query(sql, [offset, listPerPage])
               return res.json({"users":rows, page})
+            } catch (err) {
+              next(err, req, res)
+            }
+          })
+
+          app.get('/users/total', async function (req, res, next) {
+            try {
+              const connection = await mysql.createConnection(db)
+              let sql = "SELECT COUNT(users.id) AS total FROM `users`"
+              let [rows, fields] = await connection.query(sql, [])
+              return res.json(rows[0])
             } catch (err) {
               next(err, req, res)
             }
@@ -150,7 +136,7 @@ const cors = require('cors');
               const {first_name} = req.params
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.execute(sql, [first_name])
+              const [rows, fields] = await connection.execute(sql, [first_name + "%"])
               return res.json(rows[0])
             } catch (err) {
               next(err, req, res)
@@ -161,6 +147,7 @@ const cors = require('cors');
             try {
               const {first_name} = req.params
               const sql = 'SELECT COUNT(users.id) FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
+              const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [first_name + "%"])
               return res.json(rows[0])
             } catch (err) {
@@ -172,6 +159,7 @@ const cors = require('cors');
             try {
               const {last_name} = req.params
               let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?"
+              const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [last_name + "%", offset, listPerPage])
               return res.json({"users":rows, page})
             } catch (err) {
@@ -179,9 +167,22 @@ const cors = require('cors');
             }
           })
 
-          app.get('/users/:license', async function (req, res, next) {
+          app.get('/users/total/:last_name', async function (req, res, next) {
+            try {
+              const {last_name} = req.params
+              const sql = 'SELECT COUNT(users.id) FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
+              const connection = await mysql.createConnection(db)
+              let [rows, fields] = await connection.query(sql, [last_name + "%"])
+              return res.json(rows[0])
+            } catch (err) {
+              next(err, req, res)
+            }
+          })
+
+          app.get('/user/:license', async function (req, res, next) {
             const {license} = req.params
-            let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` LIKE ? OR `license_2` LIKE ? LIMIT ?,?"
+            let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ? LIMIT ?,?"
+            const connection = await mysql.createConnection(db)
             let [rows, fields] = await connection.query(sql, [license + "%", license + "%", offset, listPerPage])
             return res.json({"users":rows, page})
           })
@@ -191,7 +192,6 @@ const cors = require('cors');
             const statusCode = err.statusCode || 500;
             console.error(err.message, err.stack);
             return res.status(statusCode).json({ message: err.message });
-
           })
 
           app.listen(3300)
