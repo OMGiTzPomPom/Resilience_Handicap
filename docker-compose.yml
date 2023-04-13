@@ -44,4 +44,4 @@ services:
       context: ./rh_front/
       dockerfile: Dockerfile
     ports:
-      - 80:80
+      - 8001:80

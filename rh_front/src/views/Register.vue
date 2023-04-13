@@ -45,7 +45,6 @@ const registerVehicule = async () => {
         try {
             const fetchResponse = await fetch("http://localhost:3300/users", settings);
             const data = await fetchResponse.json();
-            console.log(data)
             
         } catch (e) {
             console.log(e);
@@ -104,7 +103,7 @@ onMounted(async () => {
                         <input
                             id="immatriculationone"
                             name="immatriculationone"
-                            placeholder="AA-123-BB"
+                            placeholder="AA123BB"
                             type="text"
                             class="form-control"
                             required="required"
@@ -121,7 +120,7 @@ onMounted(async () => {
                         <input
                             id="immatriculationtwo"
                             name="immatriculationtwo"
-                            placeholder="AA-123-BB"
+                            placeholder="AA123BB"
                             type="text"
                             class="form-control"
                             v-model="form.ImmatriculationTwo"

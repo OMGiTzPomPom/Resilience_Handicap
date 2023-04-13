@@ -3,8 +3,6 @@
 import {ref, onMounted, reactive} from "vue";
 import dayjs from "dayjs";
 
-import ViewUserModal from "@/components/modals/ViewUserModal.vue";
-
 let users = reactive([]);
 
 const formSearch = reactive({
@@ -44,7 +42,6 @@ onMounted(async () => {
     } catch (error) {
         console.log(error);
     }
-
 });
 
 const search = async (e) => {
@@ -68,9 +65,7 @@ const search = async (e) => {
     } catch (error) {
         console.log(error);
     }
-
 }
-
 
 const previous = async (e) => {
     if(page.value > 1){
@@ -82,8 +77,6 @@ const previous = async (e) => {
         data.users.forEach(el => {
             users.push(el)
         })
-        // you need to fix that to render immediately !
-        console.log(users);
     } catch (error) {
         console.log(error);
     }
@@ -100,8 +93,6 @@ const next = async (e) => {
           data.users.forEach(el => {
             users.push(el)
         })
-        // you need to fix that to render immediately !
-        console.log(users);
     } catch (error) {
         console.log(error);
     }
@@ -134,11 +125,11 @@ const next = async (e) => {
                     </thead>
                     <tbody v-for="user in users" :key="user.id">
                         <tr>
-                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal">{{ user.first_name }}</td>
-                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal">{{ user.last_name }}</td>
-                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal" v-if="user.is_disabled == 1">Yes</td>
-                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal" v-else>No</td>
-                            <td data-bs-toggle="modal" data-bs-target="#viewUserModal">{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td v-if="user.is_disabled == 1">Yes</td>
+                            <td v-else>No</td>
+                            <td>{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
                             <td>
                                 <button type="button" class="btn btn-warning btn-sm">Modify</button>
                                 <button type="button" class="btn btn-danger btn-sm">Delete</button>
@@ -161,8 +152,22 @@ const next = async (e) => {
     </div>
 
     <!--Modals-->
-
-    <ViewUserModal/>
+    <div class="modal fade" id="editUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editUserModalLabel">Mfzsfzihb</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    toto
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
