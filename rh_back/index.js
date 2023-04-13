@@ -120,10 +120,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                 return res.json(rows[0])
               }
               let sql2 = "SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ?"
-              let [rows2, fields2] = await connection.query(sql2, [search + "%"])
-              if(rows2[0]){
-                return res.json(rows2[0])
-              }
+
               let sql3 = "SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ?"
               let [rows3, fields3] = await connection.query(sql3, [search + "%"])
               if(rows3[0]){
@@ -168,9 +165,20 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
           app.get('/users/:first_name', async function (req, res, next) {
             try {
               const {first_name} = req.params
-              const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
+              const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               const [rows, fields] = await connection.execute(sql, [first_name])
+              return res.json(rows[0])
+            } catch (err) {
+              next(err, req, res)
+            }
+          })
+
+          app.get('/users/total/:first_name', async function (req, res, next) {
+            try {
+              const {first_name} = req.params
+              const sql = 'SELECT COUNT(users.id) FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
+              let [rows, fields] = await connection.query(sql, [first_name + "%"])
               return res.json(rows[0])
             } catch (err) {
               next(err, req, res)
