@@ -24,7 +24,6 @@ const form = reactive({
 
 const registerVehicule = async () => {
     form.AuthorizedUntil = dayjs(form.AuthorizedUntil).format('YYYY-MM-DD');
-    console.log(form);
             const settings = {
             method: 'POST',
             headers: {

@@ -13,13 +13,15 @@ const daysOfWeek = [...Array(7).keys()].map(day =>
 );
 
 let users = reactive([]);
-let jsonUser = reactive({firstName : "",
+let jsonUser = reactive({
+    firstName : "",
     lastName : "",
     ImmatriculationOne : "",
     ImmatriculationTwo : "",
     AuthorizedUntil : "",
     isDisabled : false,
-    days : {}});
+    days : {}
+});
 
 const formSearch = reactive({
     data : "",
@@ -31,22 +33,6 @@ let total = ref(0);
 
 const settingsGet = {
     method: 'GET',
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-    }
-}
-
-const settingsPutt = {
-    method: 'PUT',
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-    }
-}
-
-const settingsDelete = {
-    method: 'DELETE',
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -114,14 +100,49 @@ const getUser = async (id) => {
         const fetchResponse = await fetch(`http://localhost:3300/user/${id}`, settingsGet);
         const data = await fetchResponse.json();
 
-        total.value = data.total
+        jsonUser.id = data.id;
+        jsonUser.firstName =  data.first_name;
+        jsonUser.lastName =  data.last_name;
+        jsonUser.ImmatriculationOne =  data.license_1;
+        jsonUser.ImmatriculationTwo =  data.license_2;
+        jsonUser.AuthorizedUntil =  data.until;
+        jsonUser.days =  data._days;
+
+        if(data.is_disabled == 1) {
+            jsonUser.isDisabled =  true;
+        } else {
+            jsonUser.isDisabled =  false;
+        }
     } catch (error) {
         console.log(error);
     }
 }
 
-const submitModif = async () => {
-
+const submitModif = async (id) => {
+    const settings = {
+        method: 'PUT',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+                first_name : jsonUser.firstName,
+                last_name : jsonUser.lastName,
+                license_1 : jsonUser.ImmatriculationOne,
+                license_2 : jsonUser.ImmatriculationTwo,
+                disabled : jsonUser.isDisabled,
+                days : jsonUser.days,
+                until : jsonUser.AuthorizedUntil
+            }
+        )
+    }
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/user/${id}`, settings);
+        const data = await fetchResponse.json();
+        console.log(data);
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 onMounted(async () => {
@@ -146,8 +167,6 @@ onMounted(async () => {
     } catch (error) {
         console.log(error);
     }
-
-    console.log(users);
 });
 
 
@@ -184,7 +203,7 @@ onMounted(async () => {
                             <td v-else>No</td>
                             <td>{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
                             <td>
-                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal">Modify</button>
+                                <button @click="getUser(user.id)" type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal">Modify</button>
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete</button>
                             </td>
                         </tr>
@@ -206,14 +225,14 @@ onMounted(async () => {
 
     <!--Modals-->
     <div class="modal fade" id="editUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="editUserModalLabel">Update User</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent="submitModif()">
+                    <form @submit.prevent="submitModif(jsonUser.id)">
                         <div class="form-group row">
                             <label for="firstname" class="col-4 mx-auto col-form-label"
                             >First name<em class="required">*</em></label
