@@ -183,7 +183,7 @@
             const {license} = req.params
             let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ? LIMIT ?,?"
             const connection = await mysql.createConnection(db)
-            let [rows, fields] = await connection.query(sql, [license + "%", license + "%", offset, listPerPage])
+            let [rows, fields] = await connection.query(sql, [license, license, offset, listPerPage])
             return res.json({"users":rows, page})
           })
 
