@@ -8,7 +8,6 @@ import localedata from 'dayjs/plugin/localeData';
 dayjs.extend(localedata);
 dayjs.locale('en');
 
-
 const daysOfWeek = [...Array(7).keys()].map(day =>
     dayjs().locale('en').day(day + 1).format('dddd')
 );
