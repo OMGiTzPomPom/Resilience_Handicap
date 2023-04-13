@@ -2,8 +2,24 @@
 
 import {ref, onMounted, reactive} from "vue";
 import dayjs from "dayjs";
+import 'dayjs/locale/en';
+import localedata from 'dayjs/plugin/localeData';
+
+dayjs.extend(localedata);
+dayjs.locale('en');
+
+const daysOfWeek = [...Array(7).keys()].map(day =>
+    dayjs().locale('en').day(day + 1).format('dddd')
+);
 
 let users = reactive([]);
+let jsonUser = reactive({firstName : "",
+    lastName : "",
+    ImmatriculationOne : "",
+    ImmatriculationTwo : "",
+    AuthorizedUntil : "",
+    isDisabled : false,
+    days : {}});
 
 const formSearch = reactive({
     data : "",
@@ -12,37 +28,30 @@ const formSearch = reactive({
 
 let page = ref(1);
 let total = ref(0);
+
 const settingsGet = {
-        method: 'GET',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        }
+    method: 'GET',
+    headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
     }
+}
 
-onMounted(async () => {
-    page = ref(1);
-    total = ref(0);
-    try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
-        const data = await fetchResponse.json();
-        total.value = data.total
-    } catch (error) {
-        console.log(error);
+const settingsPutt = {
+    method: 'PUT',
+    headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
     }
+}
 
-    try {
-        const fetchResponse = await fetch(`http://localhost:3300/users?search=${formSearch.data}&page=${page.value}`, settingsGet);
-        const data = await fetchResponse.json();
-        users.splice(0);
-        data.users.forEach(el => {
-            users.push(el)
-        })
-
-    } catch (error) {
-        console.log(error);
+const settingsDelete = {
+    method: 'DELETE',
+    headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
     }
-});
+}
 
 const search = async (e) => {
     page = ref(1);
@@ -71,15 +80,15 @@ const previous = async (e) => {
     if(page.value > 1){
         page.value -= 1
         try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
-        const data = await fetchResponse.json();
-        users.splice(0);
-        data.users.forEach(el => {
-            users.push(el)
-        })
-    } catch (error) {
-        console.log(error);
-    }
+            const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+            const data = await fetchResponse.json();
+            users.splice(0);
+            data.users.forEach(el => {
+                users.push(el)
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 
@@ -87,17 +96,61 @@ const next = async (e) => {
     if(page.value < (total.value / 3)){
         page.value += 1
         try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+            const data = await fetchResponse.json();
+              users.splice(0);
+              data.users.forEach(el => {
+                users.push(el)
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
+const getUser = async (id) => {
+    page = ref(1);
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/user/${id}`, settingsGet);
         const data = await fetchResponse.json();
-          users.splice(0);
-          data.users.forEach(el => {
-            users.push(el)
-        })
+
+        total.value = data.total
     } catch (error) {
         console.log(error);
     }
-    }
 }
+
+const submitModif = async () => {
+
+}
+
+onMounted(async () => {
+    page = ref(1);
+    total = ref(0);
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
+        const data = await fetchResponse.json();
+        total.value = data.total
+    } catch (error) {
+        console.log(error);
+    }
+
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const data = await fetchResponse.json();
+        users.splice(0);
+        data.users.forEach(el => {
+            users.push(el)
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    console.log(users);
+});
+
+
 </script>
 
 <template>
@@ -131,8 +184,8 @@ const next = async (e) => {
                             <td v-else>No</td>
                             <td>{{ dayjs(user.until).format('DD/MM/YYYY') }}</td>
                             <td>
-                                <button type="button" class="btn btn-warning btn-sm">Modify</button>
-                                <button type="button" class="btn btn-danger btn-sm">Delete</button>
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal">Modify</button>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -153,25 +206,173 @@ const next = async (e) => {
 
     <!--Modals-->
     <div class="modal fade" id="editUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="editUserModalLabel">Mfzsfzihb</h1>
+                    <h1 class="modal-title fs-5" id="editUserModalLabel">Update User</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    toto
+                    <form @submit.prevent="submitModif()">
+                        <div class="form-group row">
+                            <label for="firstname" class="col-4 mx-auto col-form-label"
+                            >First name<em class="required">*</em></label
+                            >
+                            <div class="col-4 mx-auto">
+                                <input
+                                    id="firstname"
+                                    name="firstname"
+                                    placeholder="Doe"
+                                    type="text"
+                                    required="required"
+                                    class="form-control"
+                                    v-model="jsonUser.firstName"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="lastname" class="col-4 mx-auto col-form-label"
+                            >Last name<em class="required">*</em></label
+                            >
+                            <div class="col-4 mx-auto">
+                                <input
+                                    id="lastname"
+                                    name="lastname"
+                                    placeholder="Jane"
+                                    type="text"
+                                    class="form-control"
+                                    required="required"
+                                    v-model="jsonUser.lastName"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="immatriculationone" class="col-4 mx-auto col-form-label"
+                            >First immatriculation<em class="required">*</em></label
+                            >
+                            <div class="col-4 mx-auto">
+                                <input
+                                    id="immatriculationone"
+                                    name="immatriculationone"
+                                    placeholder="AA123BB"
+                                    type="text"
+                                    class="form-control"
+                                    required="required"
+                                    v-model="jsonUser.ImmatriculationOne"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="immatriculationtwo" class="col-4 mx-auto col-form-label"
+                            >Second Immatriculation</label
+                            >
+                            <div class="col-4 mx-auto">
+                                <input
+                                    id="immatriculationtwo"
+                                    name="immatriculationtwo"
+                                    placeholder="AA123BB"
+                                    type="text"
+                                    class="form-control"
+                                    v-model="jsonUser.ImmatriculationTwo"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="AuthorizedUntil" class="col-4 mx-auto col-form-label"
+                            >Authorized until<em class="required">*</em></label
+                            >
+                            <div class="col-4 mx-auto">
+                                <div class="demo-date-picker">
+                                    <div class="block">
+                                        <el-date-picker
+                                            v-model="jsonUser.AuthorizedUntil"
+                                            type="date"
+                                            placeholder="Pick a day"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-4 mx-auto"
+                            >Disabled<em class="required">*</em></label
+                            >
+                            <div class="col-4 mx-auto">
+                                <el-form-item>
+                                    <el-switch
+                                        v-model="jsonUser.isDisabled"
+                                        size="large"
+                                        active-text="Oui"
+                                        inactive-text="Non"
+                                        style="
+                  --el-switch-on-color: var(--bs-primary);
+                  --el-switch-off-color: var(--bs-gray-400);
+                "
+                                    />
+                                </el-form-item>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col" v-for="(d, index) in daysOfWeek" :key="index">
+                                <p>{{ d }}<em class="required">*</em></p>
+                                <el-select v-model="jsonUser.days[d]" placeholder="Select" required>
+                                    <el-option label="Building A" value="a"></el-option>
+                                    <el-option label="Building B" value="b"></el-option>
+                                    <el-option label="Building C" value="c"></el-option>
+                                </el-select>
+
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editUserModalLabel">Delete User</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure to delete toto ?</p>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button class="btn btn-danger" data-bs-dismiss="modal">Non</button>
+                    <button class="btn btn-success" data-bs-dismiss="modal">Oui</button>
                 </div>
             </div>
         </div>
     </div>
+
 </template>
 
 <style scoped>
 button {
     margin: 0px 5px;
+}
+
+button.btn-danger,
+button.btn-success{
+    color: #ffffff;
+}
+
+div.form-group,
+div.row {
+    margin: 10px 0px;
 }
 </style>
