@@ -168,7 +168,7 @@
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               const [rows, fields] = await connection.execute(sql, [first_name + "%"])
-              return res.json(rows[0])
+              return res.json(rows)
             } catch (err) {
               next(err, req, res)
             }
@@ -177,7 +177,7 @@
           app.get('/users/total/:first_name', async function (req, res, next) {
             try {
               const {first_name} = req.params
-              const sql = 'SELECT COUNT(users.id) FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
+              const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [first_name + "%"])
               return res.json(rows[0])
@@ -201,7 +201,7 @@
           app.get('/users/total/:last_name', async function (req, res, next) {
             try {
               const {last_name} = req.params
-              const sql = 'SELECT COUNT(users.id) FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
+              const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [last_name + "%"])
               return res.json(rows[0])
