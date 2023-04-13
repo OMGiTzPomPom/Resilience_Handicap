@@ -144,7 +144,7 @@
               const connection = await mysql.createConnection(db)
               let sql = "SELECT COUNT(users.id) AS total FROM `users`"
               let [rows, fields] = await connection.query(sql, [])
-              return res.json(rows)
+              return res.json({"total": rows[0].total})
             } catch (err) {
               next(err, req, res)
             }
@@ -182,7 +182,7 @@
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [first_name + "%"])
-              return res.json(rows[0])
+              return res.json({"total": rows[0].total})
             } catch (err) {
               next(err, req, res)
             }
@@ -208,7 +208,7 @@
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [last_name + "%"])
-              return res.json(rows[0])
+              return res.json({"total": rows[0].total})
             } catch (err) {
               next(err, req, res)
             }

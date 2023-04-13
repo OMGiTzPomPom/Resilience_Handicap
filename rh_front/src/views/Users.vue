@@ -65,7 +65,7 @@ const searchByFirstName = async (e) => {
     }
 }
 
-const searchByLasttName = async (e) => {
+const searchByLastName = async (e) => {
     page = ref(1);
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/last_name/total/${formSearch.lastname}`, settingsGet);
@@ -115,7 +115,7 @@ const previous = async (e) => {
     if(page.value > 1){
         page.value -= 1
         try {
-            const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`http://localhost:3300/users/${formSearch.data}/?page=${page.value}`, settingsGet);
             const data = await fetchResponse.json();
             users.splice(0);
             data.users.forEach(el => {
@@ -131,7 +131,7 @@ const next = async (e) => {
     if(page.value < (total.value / 3)){
         page.value += 1
         try {
-            const fetchResponse = await fetch(`http://localhost:3300/users/?search=${formSearch.data}&page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`http://localhost:3300/users/${formSearch.data}/?page=${page.value}`, settingsGet);
             const data = await fetchResponse.json();
               users.splice(0);
               data.users.forEach(el => {
@@ -140,6 +140,34 @@ const next = async (e) => {
         } catch (error) {
             console.log(error);
         }
+    }
+}
+
+const previousFirstName = async (e) => {
+    if(page.value > 1){
+        page.value -= 1
+        searchByFirstName()
+    }
+}
+
+const nextFirstName = async (e) => {
+    if(page.value < (total.value / 3)){
+        page.value += 1
+        searchByFirstName()
+    }
+}
+
+const previousLastName = async (e) => {
+    if(page.value > 1){
+        page.value -= 1
+        searchByLastName()
+    }
+}
+
+const nextLastName = async (e) => {
+    if(page.value < (total.value / 3)){
+        page.value += 1
+        searchByLastName()
     }
 }
 
@@ -215,6 +243,7 @@ onMounted(async () => {
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
         const data = await fetchResponse.json();
+        console.log(data)
         total.value = data[0].total
     } catch (error) {
         console.log(error);
@@ -251,7 +280,7 @@ onMounted(async () => {
                     <div class="col">
                         <form class="" role="search">
                             <h5>Search by Last Name</h5>
-                            <input @input.prevent="searchByLasttName" v-model="formSearch.lastname" class="form-control" type="search" placeholder="Search by Last Name" aria-label="Search">
+                            <input @input.prevent="searchByLastName" v-model="formSearch.lastname" class="form-control" type="search" placeholder="Search by Last Name" aria-label="Search">
                         </form>
                     </div>
                     <div class="col">
