@@ -167,7 +167,7 @@ onMounted(async () => {
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
         const data = await fetchResponse.json();
-        total.value = data[0].total
+        total.value = data.total
     } catch (error) {
         console.log(error);
     }
