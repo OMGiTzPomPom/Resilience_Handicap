@@ -4,6 +4,7 @@ import {ref, onMounted, reactive} from "vue";
 import dayjs from "dayjs";
 import 'dayjs/locale/en';
 import localedata from 'dayjs/plugin/localeData';
+import router from "@/router";
 
 dayjs.extend(localedata);
 dayjs.locale('en');
@@ -131,15 +132,14 @@ const submitModif = async (id) => {
                 license_1 : jsonUser.ImmatriculationOne,
                 license_2 : jsonUser.ImmatriculationTwo,
                 disabled : jsonUser.isDisabled,
-                days : jsonUser.days,
-                until : jsonUser.AuthorizedUntil
+                days : JSON.stringify(jsonUser.days),
+                until : dayjs(jsonUser.AuthorizedUntil).format('YYYY-MM-DD')
             }
         )
     }
     try {
-        const fetchResponse = await fetch(`http://localhost:3300/user/${id}`, settings);
-        const data = await fetchResponse.json();
-        console.log(data);
+        await fetch(`http://localhost:3300/user/${id}`, settings);
+        await location.reload();
     } catch (e) {
         console.log(e);
     }
@@ -149,7 +149,7 @@ onMounted(async () => {
     page = ref(1);
     total = ref(0);
     try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/total/?search=${formSearch.data}`, settingsGet);
+        const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
         const data = await fetchResponse.json();
         total.value = data.total
     } catch (error) {
@@ -157,7 +157,7 @@ onMounted(async () => {
     }
 
     try {
-        const fetchResponse = await fetch(`http://localhost:3300/users?search=${formSearch.data}&page=${page.value}`, settingsGet);
+        const fetchResponse = await fetch(`http://localhost:3300/users`, settingsGet);
         const data = await fetchResponse.json();
         users.splice(0);
         data.users.forEach(el => {
