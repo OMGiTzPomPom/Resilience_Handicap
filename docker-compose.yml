@@ -43,3 +43,5 @@ services:
     build: 
       context: ./rh_front/
       dockerfile: Dockerfile
+    ports:
+      - 80:80
