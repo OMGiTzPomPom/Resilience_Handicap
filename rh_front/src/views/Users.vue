@@ -167,7 +167,7 @@ onMounted(async () => {
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
         const data = await fetchResponse.json();
-        total.value = data.total
+        total.value = data[0].total
     } catch (error) {
         console.log(error);
     }
@@ -193,9 +193,26 @@ onMounted(async () => {
         <div class="row">
             <nav class="navbab">
             <div class="container">
-                <form class="" role="search">
-                     <input @input.prevent="search" v-model="formSearch.data" class="form-control" type="search" placeholder="Search" aria-label="Search">
-                </form>
+                <div class="row">
+                    <div class="col">
+                        <form class="" role="search">
+                            <h5>Seach by First Name</h5>
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                        </form>
+                    </div>
+                    <div class="col">
+                        <form class="" role="search">
+                            <h5>Seach by Last Name</h5>
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                        </form>
+                    </div>
+                    <div class="col">
+                    <form class="" role="search">
+                        <h5>Seach by License</h5>
+                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                    </form>
+                </div>
+                </div>
             </div>
             </nav>
         </div>
