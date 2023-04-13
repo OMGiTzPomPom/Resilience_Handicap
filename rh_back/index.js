@@ -142,33 +142,12 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
           app.get('/users', async function (req, res, next) {
             try {
-
-              const search = req.query.search ?? undefined
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
               const connection = await mysql.createConnection(db)
-
-              if(search === undefined || (typeof search === "string" && search === "")){
-                let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` LIMIT ?,?"
-                let [rows, fields] = await connection.query(sql, [offset, listPerPage])
-                console.log("all");
-                return res.json({"users":rows, page})
-              }
-
-              let sql3 = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?"
-              let [rows3, fields3] = await connection.query(sql3, [search + "%", offset, listPerPage])
-              if(rows3.length > 0)
-              {
-                console.log("last name");
-                return res.json({"users":rows3, page})
-              }
-              let sql4 = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` LIKE ? OR `license_2` LIKE ? LIMIT ?,?"
-              let [rows4, fields4] = await connection.query(sql4, [search + "%", search + "%", offset, listPerPage])
-              if(rows4.length > 0)
-              {
-                console.log("license");
-                return res.json({"users":rows4, page})
-              }
+              let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` LIMIT ?,?"
+              let [rows, fields] = await connection.query(sql, [offset, listPerPage])
+              return res.json({"users":rows, page})
             } catch (err) {
               next(err, req, res)
             }
@@ -189,7 +168,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
           app.get('/users/:first_name', async function (req, res, next) {
             try {
               const {first_name} = req.params
-              const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` = ?'
+              const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
               const connection = await mysql.createConnection(db)
               const [rows, fields] = await connection.execute(sql, [first_name])
               return res.json(rows[0])
@@ -201,25 +180,19 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
           app.get('/users/:last_name', async function (req, res, next) {
             try {
               const {last_name} = req.params
-              const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` = ?'
-              const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.execute(sql, [last_name])
-              return res.json(rows[0])
+              let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?"
+              let [rows, fields] = await connection.query(sql, [last_name + "%", offset, listPerPage])
+              return res.json({"users":rows, page})
             } catch (err) {
               next(err, req, res)
             }
           })
 
           app.get('/users/:license', async function (req, res, next) {
-            try {
-              const {license} = req.params
-              const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` = ?'
-              const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.execute(sql, [last_name])
-              return res.json(rows[0])
-            } catch (err) {
-              next(err, req, res)
-            }
+            const {license} = req.params
+            let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` LIKE ? OR `license_2` LIKE ? LIMIT ?,?"
+            let [rows, fields] = await connection.query(sql, [license + "%", license + "%", offset, listPerPage])
+            return res.json({"users":rows, page})
           })
 
 
