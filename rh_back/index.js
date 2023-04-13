@@ -167,10 +167,12 @@
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
               const {first_name} = req.params
+              console.log(first_name, offset, listPerPage)
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
+              console.log(sql);
               const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.execute(sql, [first_name + "%", offset, listPerPage])
-              return res.json(rows)
+              const [rows, fields] = await connection.query(sql, [first_name + "%", offset, listPerPage])
+              return res.json({"users": rows, page})
             } catch (err) {
               next(err, req, res)
             }
@@ -179,7 +181,7 @@
           app.get('/users/first_name/total/:first_name', async function (req, res, next) {
             try {
               const {first_name} = req.params
-              const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
+              const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ?'
               const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [first_name + "%"])
               return res.json({"total": rows[0].total})
@@ -205,7 +207,7 @@
           app.get('/users/last_name/total/:last_name', async function (req, res, next) {
             try {
               const {last_name} = req.params
-              const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?'
+              const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ?'
               const connection = await mysql.createConnection(db)
               let [rows, fields] = await connection.query(sql, [last_name + "%"])
               return res.json({"total": rows[0].total})
@@ -216,7 +218,7 @@
 
           app.get('/user/license/:license', async function (req, res, next) {
             const {license} = req.params
-            let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ? LIMIT ?,?"
+            let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?"
             const connection = await mysql.createConnection(db)
             let [rows, fields] = await connection.query(sql, [license, license])
             return res.json({"users":rows, page})

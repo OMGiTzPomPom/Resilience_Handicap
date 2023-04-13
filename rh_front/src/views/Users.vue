@@ -42,8 +42,35 @@ const settingsGet = {
     }
 }
 
-const searchByFirstName = async (e) => {
+const getAllUsers = async (e) => {
     page = ref(1);
+    total = ref(0);
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
+        const data = await fetchResponse.json();
+        console.log(data)
+        total.value = data.total
+    } catch (error) {
+        console.log(error);
+    }
+
+    try {
+        const fetchResponse = await fetch(`http://localhost:3300/users`, settingsGet);
+        const data = await fetchResponse.json();
+        users.splice(0);
+        data.users.forEach(el => {
+            users.push(el)
+        })
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+const searchByFirstName = async (e) => {
+    if(formSearch.firstname === "") return getAllUsers()
+    page = ref(1);
+    formSearch.lastname = ""
+    formSearch.license = ""
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/first_name/total/${formSearch.firstname}`, settingsGet);
         const data = await fetchResponse.json();
@@ -66,7 +93,10 @@ const searchByFirstName = async (e) => {
 }
 
 const searchByLastName = async (e) => {
+    if(formSearch.lastname === "") return getAllUsers()
     page = ref(1);
+    formSearch.firstname = ""
+    formSearch.license = ""
     try {
         const fetchResponse = await fetch(`http://localhost:3300/users/last_name/total/${formSearch.lastname}`, settingsGet);
         const data = await fetchResponse.json();
@@ -89,7 +119,10 @@ const searchByLastName = async (e) => {
 }
 
 const searchByLicense = async (e) => {
+    if(formSearch.license === "") return getAllUsers()
     page = ref(1);
+    formSearch.firstname = ""
+    formSearch.lastname = ""
     try {
         const fetchResponse = await fetch(`http://localhost:3300/user/license/total/${formSearch.license}`, settingsGet);
         const data = await fetchResponse.json();
@@ -115,7 +148,7 @@ const previous = async (e) => {
     if(page.value > 1){
         page.value -= 1
         try {
-            const fetchResponse = await fetch(`http://localhost:3300/users/${formSearch.data}/?page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`http://localhost:3300/users/?page=${page.value}`, settingsGet);
             const data = await fetchResponse.json();
             users.splice(0);
             data.users.forEach(el => {
@@ -131,7 +164,7 @@ const next = async (e) => {
     if(page.value < (total.value / 3)){
         page.value += 1
         try {
-            const fetchResponse = await fetch(`http://localhost:3300/users/${formSearch.data}/?page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`http://localhost:3300/users/?page=${page.value}`, settingsGet);
             const data = await fetchResponse.json();
               users.splice(0);
               data.users.forEach(el => {
@@ -238,28 +271,7 @@ const deleteUser = async (id) => {
 }
 
 onMounted(async () => {
-    page = ref(1);
-    total = ref(0);
-    try {
-        const fetchResponse = await fetch(`http://localhost:3300/users/total`, settingsGet);
-        const data = await fetchResponse.json();
-        console.log(data)
-        total.value = data[0].total
-    } catch (error) {
-        console.log(error);
-    }
-
-    try {
-        const fetchResponse = await fetch(`http://localhost:3300/users`, settingsGet);
-        const data = await fetchResponse.json();
-        users.splice(0);
-        data.users.forEach(el => {
-            users.push(el)
-        })
-
-    } catch (error) {
-        console.log(error);
-    }
+    getAllUsers()
 });
 
 
@@ -325,11 +337,19 @@ onMounted(async () => {
             Page: {{ page }} of {{ (Math.round(total / 3) === 0) ? 1 : Math.round(total / 3)  }}
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col" v-if="formSearch.firstname != ''">
+                <button @click="previousFirstName" type="button" class="btn btn-sm">previous</button>
+                <button @click="nextFirstName" type="button" class="btn btn-sm">next</button>
+            </div>
+            <div class="col" v-else-if="formSearch.lastname != ''">
+                <button @click="previousLastName" type="button" class="btn btn-sm">previous</button>
+                <button @click="nextLastName" type="button" class="btn btn-sm">next</button>
+            </div>
+            <div class="col" v-else-if="formSearch.license != ''"></div>
+            <div class="col" v-else>
                 <button @click="previous" type="button" class="btn btn-sm">previous</button>
                 <button @click="next" type="button" class="btn btn-sm">next</button>
             </div>
-
         </div>
     </div>
 
