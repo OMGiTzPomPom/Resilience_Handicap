@@ -9,3 +9,6 @@ You have to launch the project using ``docker-compose up``.
 - extremety1989 : Andranik Arakelov
 - JunkJumper : Pauline Srifi
 
+# Architecture
+- https://app.diagrams.net/
+- rh_architecture.xml
