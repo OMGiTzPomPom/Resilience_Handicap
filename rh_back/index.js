@@ -6,8 +6,6 @@
 
           app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
         
-    
-          
           const listPerPage = 3
 
           const db = {
@@ -34,22 +32,26 @@
           app.use(express.json())
 
 
-
           //need to think about it !
-          // app.post('/parking', async function (req, res, next) {
-          //   try {
-          //     const { _number, area } = req.body
-          //     const {id} = req.params
-              
-          //     const connection = await mysql.createConnection(db)
-          //     const sql = 'INSERT INTO parking (_number, area, taken_by) VALUES (?,?,?)'
+          app.post('/parking', async function (req, res, next) {
+            try {
+              const { plate } = req.body
 
-          //     const [rows, fields] = await connection.execute(sql, [])
-          //     return res.json(rows)
-          //   } catch (err) {
-          //     next(err, req, res)
-          //   }
-          // })
+              let connection = await mysql.createConnection(db)
+              let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
+    
+              // const [rows2, fields2] = await connection.execute('INSERT INTO parking (_number, area, taken_by) VALUES (?,?,?)', [])
+              let current_date = Date.now();
+              let row = JSON.parse(JSON.stringify(rows[0]))
+              if (new Date(row.until) >= current_date){
+
+                const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
+                return res.json({"id":id, "area": area, "is_disabled": row.is_disabled})
+              }
+            } catch (err) {
+              next(err, req, res)
+            }
+          })
 
           // app.get('/parking', async function (req, res, next) {
           //   try {
