@@ -14,12 +14,16 @@ services:
 
   adminer:
     image: adminer
+    depends_on:
+      - db
     restart: unless-stopped
     ports:
       - 8081:8080
 
   backend:
     container_name: backend
+    depends_on:
+      - db
     build: 
       context: ./rh_back/
       dockerfile: Dockerfile
@@ -30,6 +34,8 @@ services:
 
   front:
     container_name: frontend
+    depends_on:
+      - backend
     build: 
       context: ./rh_front/
       dockerfile: Dockerfile
@@ -38,6 +44,8 @@ services:
 
   caddy:
     image: caddy:latest
+    depends_on:
+      - db
     restart: unless-stopped
     ports:
       - "81:80"
