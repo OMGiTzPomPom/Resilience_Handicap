@@ -456,8 +456,8 @@ onMounted(async () => {
                                     <el-switch
                                         v-model="jsonUser.isDisabled"
                                         size="large"
-                                        active-text="Oui"
-                                        inactive-text="Non"
+                                        active-text="Yes"
+                                        inactive-text="No"
                                         style="
                   --el-switch-on-color: var(--bs-primary);
                   --el-switch-off-color: var(--bs-gray-400);
@@ -501,8 +501,8 @@ onMounted(async () => {
                     <p>Are you sure to delete toto ?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button class="btn btn-danger" data-bs-dismiss="modal">Non</button>
-                    <button @click="deleteUser(jsonUser.id)" class="btn btn-success" data-bs-dismiss="modal">Oui</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                    <button @click="deleteUser(jsonUser.id)" class="btn btn-success" data-bs-dismiss="modal">Yes</button>
                 </div>
             </div>
         </div>

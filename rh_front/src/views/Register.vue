@@ -153,8 +153,8 @@ onMounted(async () => {
                             <el-switch
                                 v-model="form.isDisabled"
                                 size="large"
-                                active-text="Oui"
-                                inactive-text="Non"
+                                active-text="Yes"
+                                inactive-text="No"
                                 style="
                   --el-switch-on-color: var(--bs-primary);
                   --el-switch-off-color: var(--bs-gray-400);
