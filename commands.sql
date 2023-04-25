@@ -65,3 +65,12 @@ VALUES ("Adam", "Oumarov", "AD707Z0", "", 0, '{
     "Saturday": "b",
     "Sunday": "c"
 }', "2024-12-28");
+
+
+DROP TABLE IF EXISTS parking;
+CREATE TABLE parking (
+    number TINYINT (1),
+    area VARCHAR (1),
+    plate VARCHAR (7),
+    PRIMARY KEY (number)
+) ENGINE=InnoDB;
