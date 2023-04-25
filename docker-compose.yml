@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
     ports:
       - "81:80"
-      - "443:443"
+      - "82:443"
     volumes:
       - './rh_caddy/Caddyfile:/etc/caddy/Caddyfile'
       - './rh_front/dist/:/srv'
