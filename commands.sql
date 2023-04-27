@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
-    id INT(10) AUTO_INCREMENT, 
+    id BIGINT(10) AUTO_INCREMENT, 
     first_name VARCHAR (255), 
     last_name VARCHAR (255),
     license_1 VARCHAR (7) UNIQUE,
@@ -69,8 +69,9 @@ VALUES ("Adam", "Oumarov", "AD707Z0", "", 0, '{
 
 DROP TABLE IF EXISTS parking;
 CREATE TABLE parking (
+    id BIGINT(10) AUTO_INCREMENT,
     number TINYINT (1),
-    area VARCHAR (1),
-    plate VARCHAR (7),
-    PRIMARY KEY (number)
+    area VARCHAR (1) UNIQUE,
+    plate VARCHAR (7) UNIQUE,
+    PRIMARY KEY (id)
 ) ENGINE=InnoDB;
