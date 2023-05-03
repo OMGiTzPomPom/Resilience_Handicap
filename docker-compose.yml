@@ -43,7 +43,10 @@ services:
       - 8001:80
 
   caddy:
-    image: caddy:latest
+    container_name: caddy
+    build: 
+      context: ./rh_caddy/
+      dockerfile: Dockerfile
     depends_on:
       - db
     restart: unless-stopped
