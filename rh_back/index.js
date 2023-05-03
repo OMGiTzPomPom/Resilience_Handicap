@@ -197,26 +197,26 @@
            *           schema:
            *             type: object
            *             properties:
-           *                first_name:
+           *               first_name:
            *                  type: string
            *                  description: First name of the user
-           *                last_name:
+           *               last_name:
            *                  type: string
            *                  description: Last name of the user
-           *                until:
+           *               until:
            *                  type: string
            *                  description: Expiration date of the user's account
-           *                format: date
-           *                  is_disabled:
+           *                  format: date
+           *               is_disabled:
            *                  type: integer
            *                  description: Whether the user is disabled (0 for no, 1 for yes)
-           *                license_1:
+           *               license_1:
            *                  type: string
            *                  description: First driver's license number
-           *                license_2:
+           *               license_2:
            *                  type: string
            *                  description: Second driver's license number
-           *                _days:
+           *               _days:
            *                  type: object
            *                  description: Days of the week when the user is allowed to park
            *                  properties:
@@ -251,7 +251,7 @@
            *               properties:
            *                 affectedRows:
            *                   type: integer
-           *                   description: The number of affected rows in the database
+           *                   description: The number of affected rows
            *                 insertId:
            *                   type: integer
            *                   description: The ID of the newly inserted user
@@ -273,7 +273,7 @@
            * /user/{id}:
            *   put:
            *     summary: Update a user by ID
-           *     description: Update a user in the database using their ID
+           *     description: Update a user using their ID
            *     parameters:
            *       - in: path
            *         name: id
@@ -364,30 +364,30 @@
            *                   type: string
            *                   description: Second driver's license number
            *                 _days:
-           *                    type: object
-           *                    description: Days of the week when the user is allowed to park
-           *                    properties:
-           *                       Monday:
-           *                          type: string
-           *                          description: Parking permission in area for Monday
-           *                       Tuesday:
-           *                          type: string
-           *                          description: Parking permission in area for Tuesday
-           *                       Wednesday:
-           *                          type: string
-           *                          description: Parking permission in area for Wednesday
-           *                       Thursday:
-           *                          type: string
-           *                          description: Parking permission in area for Thursday
-           *                       Friday:
-           *                          type: string
-           *                          description: Parking permission in area for Friday
-           *                       Saturday:
-           *                          type: string
-           *                          description: Parking permission in area for Saturday
-           *                       Sunday:
-           *                          type: string
-           *                          description: Parking permission in area for Sunday
+           *                   type: object
+           *                   description: Days of the week when the user is allowed to park
+           *                   properties:
+           *                     Monday:
+           *                       type: string
+           *                       description: Parking permission in area for Monday
+           *                     Tuesday:
+           *                       type: string
+           *                       description: Parking permission in area for Tuesday
+           *                     Wednesday:
+           *                       type: string
+           *                       description: Parking permission in area for Wednesday
+           *                     Thursday:
+           *                       type: string
+           *                       description: Parking permission in area for Thursday
+           *                     Friday:
+           *                       type: string
+           *                       description: Parking permission in area for Friday
+           *                     Saturday:
+           *                       type: string
+           *                       description: Parking permission in area for Saturday
+           *                     Sunday:
+           *                       type: string
+           *                       description: Parking permission in area for Sunday
            *       '400':
            *         description: Bad request
            *       '404':
@@ -532,7 +532,7 @@
            * /users/total:
            *   get:
            *     summary: Get the total number of users.
-           *     description: Returns the total number of users in the database.
+           *     description: Returns the total number of users.
            *     responses:
            *       200:
            *         description: The total number of users.
@@ -543,7 +543,7 @@
            *               properties:
            *                 total:
            *                   type: integer
-           *                   description: The total number of users in the database.
+           *                   description: The total number of users.
            */
           app.get('/users/total', async function (req, res, next) {
             try {
@@ -577,53 +577,53 @@
            *             schema:
            *             type: object
            *             properties:
-           *                id:
-           *                  type: integer
-           *                  description: User ID
-           *                first_name:
-           *                  type: string
-           *                  description: First name of the user
-           *                last_name:
-           *                  type: string
-           *                  description: Last name of the user
-           *                until:
-           *                  type: string
-           *                  description: Expiration date of the user's account
-           *                  format: date
-           *                is_disabled:
-           *                   type: integer
-           *                   description: Whether the user is disabled (0 for no, 1 for yes)
-           *                license_1:
-           *                   type: string
-           *                   description: First driver's license number
-           *                license_2:
-           *                   type: string
-           *                   description: Second driver's license number
-           *                _days:
-           *                   type: object
-           *                   description: Days of the week when the user is allowed to park
-           *                   properties:
-           *                      Monday:
-           *                        type: string
-           *                        description: Parking permission in area for Monday
-           *                      Tuesday:
-           *                        type: string
-           *                        description: Parking permission in area for Tuesday
-           *                      Wednesday:
-           *                        type: string
-           *                        description: Parking permission in area for Wednesday
-           *                      Thursday:
-           *                        type: string
-           *                        description: Parking permission in area for Thursday
-           *                      Friday:
-           *                        type: string
-           *                        description: Parking permission in area for Friday
-           *                      Saturday:
-           *                        type: string
-           *                        description: Parking permission in area for Saturday
-           *                      Sunday:
-           *                        type: string
-           *                        description: Parking permission in area for Sunday
+           *               id:
+           *                 type: integer
+           *                 description: User ID
+           *               first_name:
+           *                 type: string
+           *                 description: First name of the user
+           *               last_name:
+           *                 type: string
+           *                 description: Last name of the user
+           *               until:
+           *                 type: string
+           *                 description: Expiration date of the user's account
+           *                 format: date
+           *               is_disabled:
+           *                 type: integer
+           *                 description: Whether the user is disabled (0 for no, 1 for yes)
+           *               license_1:
+           *                 type: string
+           *                 description: First driver's license number
+           *               license_2:
+           *                 type: string
+           *                 description: Second driver's license number
+           *               _days:
+           *                 type: object
+           *                 description: Days of the week when the user is allowed to park
+           *                 properties:
+           *                   Monday:
+           *                     type: string
+           *                     description: Parking permission in area for Monday
+           *                   Tuesday:
+           *                     type: string
+           *                     description: Parking permission in area for Tuesday
+           *                   Wednesday:
+           *                     type: string
+           *                     description: Parking permission in area for Wednesday
+           *                   Thursday:
+           *                     type: string
+           *                     description: Parking permission in area for Thursday
+           *                   Friday:
+           *                     type: string
+           *                     description: Parking permission in area for Friday
+           *                   Saturday:
+           *                     type: string
+           *                     description: Parking permission in area for Saturday
+           *                   Sunday:
+           *                     type: string
+           *                     description: Parking permission in area for Sunday
            *       404:
            *         description: User not found.
            *       500:
@@ -665,53 +665,53 @@
            *             schema:
            *             type: object
            *             properties:
-           *                id:
-           *                  type: integer
-           *                  description: User ID
-           *                first_name:
-           *                  type: string
-           *                  description: First name of the user
-           *                last_name:
-           *                   type: string
-           *                   description: Last name of the user
-           *                until:
-           *                   type: string
-           *                   description: Expiration date of the user's account
-           *                   format: date
-           *                is_disabled:
-           *                   type: integer
-           *                   description: Whether the user is disabled (0 for no, 1 for yes)
-           *                license_1:
-           *                    type: string
-           *                    description: First driver's license number
-           *                license_2:
-           *                    type: string
-           *                    description: Second driver's license number
-           *                _days:
-           *                     type: object
-           *                     description: Days of the week when the user is allowed to park
-           *                     properties:
-           *                        Monday:
-           *                           type: string
-           *                           description: Parking permission in area for Monday
-           *                        Tuesday:
-           *                           type: string
-           *                           description: Parking permission in area for Tuesday
-           *                        Wednesday:
-           *                           type: string
-           *                           description: Parking permission in area for Wednesday
-           *                        Thursday:
-           *                           type: string
-           *                           description: Parking permission in area for Thursday
-           *                        Friday:
-           *                           type: string
-           *                           description: Parking permission in area for Friday
-           *                        Saturday:
-           *                           type: string
-           *                           description: Parking permission in area for Saturday
-           *                        Sunday:
-           *                           type: string
-           *                           description: Parking permission in area for Sunday
+           *               id:
+           *                 type: integer
+           *                 description: User ID
+           *               first_name:
+           *                 type: string
+           *                 description: First name of the user
+           *               last_name:
+           *                 type: string
+           *                 description: Last name of the user
+           *               until:
+           *                 type: string
+           *                 description: Expiration date of the user's account
+           *                 format: date
+           *               is_disabled:
+           *                 type: integer
+           *                 description: Whether the user is disabled (0 for no, 1 for yes)
+           *               license_1:
+           *                 type: string
+           *                 description: First driver's license number
+           *               license_2:
+           *                 type: string
+           *                 description: Second driver's license number
+           *               _days:
+           *                 type: object
+           *                 description: Days of the week when the user is allowed to park
+           *                 properties:
+           *                   Monday:
+           *                     type: string
+           *                     description: Parking permission in area for Monday
+           *                   Tuesday:
+           *                     type: string
+           *                     description: Parking permission in area for Tuesday
+           *                   Wednesday:
+           *                     type: string
+           *                     description: Parking permission in area for Wednesday
+           *                   Thursday:
+           *                     type: string
+           *                     description: Parking permission in area for Thursday
+           *                   Friday:
+           *                     type: string
+           *                     description: Parking permission in area for Friday
+           *                   Saturday:
+           *                     type: string
+           *                     description: Parking permission in area for Saturday
+           *                   Sunday:
+           *                     type: string
+           *                     description: Parking permission in area for Sunday
            *       '404':
            *         description: User not found
            */
