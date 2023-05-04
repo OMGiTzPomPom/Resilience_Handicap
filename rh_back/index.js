@@ -132,6 +132,37 @@
               next(err, req, res)
             }
           })
+          /**
+           * @openapi
+           * /spot:
+           *   get:
+           *     summary: Get parking spot
+           *     description: Returns parking spot with their respective area.
+           *     responses:
+           *       '200':
+           *         description: Returns area and a parking number
+           *         content:
+           *           text/plain:
+           *             schema:
+           *                type: string
+           *                example: a1
+           *       '500':
+           *          description: Internal server error
+           */
+          app.get('/spot', async function (req, res, next) {
+            try {
+              const connection = await mysql.createConnection(db)
+              const [rows, fields] = await connection.query("SELECT number, area FROM `parking` LIMIT 1")
+              let row = JSON.parse(JSON.stringify(rows[0]))
+              let string = ""
+              string += row.area
+              string += row.number
+              res.type('text/plain')
+              return res.send(string)
+            } catch (err) {
+              next(err, req, res)
+            }
+          })
 
           /**
            * @openapi
