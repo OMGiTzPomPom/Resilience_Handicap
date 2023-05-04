@@ -263,7 +263,7 @@
                      if ((i == 2 && license_1[i] === "O") || (i == 3 && license_1[i] === "O") || (i == 4 && license_1[i] === "O")){
                         license_1[i] = "0"
                      }
-                     if ((i == 0 && license_1[i] === "0") || (i == 1 && license_1[i] === "0") || (i == 5 && license_1[i] === "0") || (i == 5 && license_1[i] === "0")){
+                     if ((i == 0 && license_1[i] === "0") || (i == 1 && license_1[i] === "0") || (i == 5 && license_1[i] === "0") || (i == 6 && license_1[i] === "0")){
                       license_1[i] = "O"
                    }
                 }
@@ -271,7 +271,7 @@
                     if ((i == 2 && license_2[i] === "O") || (i == 3 && license_2[i] === "O") || (i == 4 && license_2[i] === "O")){
                       license_2[i] = "0"
                     }
-                    if ((i == 0 && license_2[i] === "0") || (i == 1 && license_2[i] === "0") || (i == 5 && license_2[i] === "0") || (i == 5 && license_2[i] === "0")){
+                    if ((i == 0 && license_2[i] === "0") || (i == 1 && license_2[i] === "0") || (i == 5 && license_2[i] === "0") || (i == 6 && license_2[i] === "0")){
                     license_2[i] = "O"
                   }
                 }
