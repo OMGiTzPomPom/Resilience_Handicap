@@ -157,8 +157,14 @@
               let string = ""
               string += row.area
               string += row.number
-              res.type('text/plain')
-              return res.send(string)
+              const message = await connection.execute('DELETE FROM `parking` WHERE `number` = ? AND `area` = ?', [row.number, row.area])
+              if(message[0]["affectedRows"] > 0){
+                res.type('text/plain')
+                return res.send(string)
+              }else{
+                return res.send({})
+              }
+ 
             } catch (err) {
               next(err, req, res)
             }
