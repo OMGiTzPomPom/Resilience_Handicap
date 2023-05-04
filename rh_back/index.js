@@ -75,9 +75,9 @@
                   if(row.is_disabled) {
 
                     if(rows2.length > 0){
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (1,?,?)', [area, plate])
+                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [1, area, plate])
                     }else{
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (0,?,?)', [area, plate])
+                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
                     }
                   // if not is_disabled
                   } else {
@@ -86,7 +86,7 @@
                       while (i < rows2.length) {i++}
                       await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
                     }else{
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (2,?,?)', [area, plate])
+                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [2, area, plate])
                     }
                   }
                   
