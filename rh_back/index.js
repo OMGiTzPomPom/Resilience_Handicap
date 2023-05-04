@@ -177,7 +177,7 @@
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
               const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.query("SELECT number, area, plate FROM `parking LIMIT ?,?", [ offset, 9])
+              const [rows, fields] = await connection.query("SELECT number, area, plate FROM `parking` LIMIT ?,?", [ offset, 9])
               return res.json({"parking":rows, page})
             } catch (err) {
               next(err, req, res)
