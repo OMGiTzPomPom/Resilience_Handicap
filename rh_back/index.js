@@ -259,6 +259,13 @@
           app.post('/users', async function (req, res, next) {
               try {
                 const {first_name, last_name, license_1, license_2, is_disabled, _days, until } = req.body
+
+                // console.log(req.body)
+
+                // license_1: 'ZE123ED'
+
+                // const test1 = license_1.slice(0, 1)
+
                 for (let i = 0; i < license_1.length; i++) {
                      if ((i == 2 && license_1[i] === "O") || (i == 3 && license_1[i] === "O") || (i == 4 && license_1[i] === "O")){
                         license_1[i] = "0"
@@ -275,9 +282,15 @@
                     license_2[i] = "O"
                   }
                 }
+                let license_2_mod = "NULL"
+                console.log(license_2.length);
+                if(license_2.length !== 0) {
+                  license_2_mod = license_2
+                }
+                console.log(license_2_mod);
                 const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
                 const connection = await mysql.createConnection(db)
-                const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, is_disabled, _days, until])
+                const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, is_disabled, _days, until])
                 return res.json(rows)
               } catch (err) {
                 next(err, req, res)
