@@ -162,7 +162,7 @@
                 res.type('text/plain')
                 return res.send(string)
               }else{
-                return res.send({})
+                return res.send("")
               }
  
             } catch (err) {
