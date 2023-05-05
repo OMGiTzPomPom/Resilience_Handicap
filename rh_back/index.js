@@ -3,9 +3,24 @@
           const swaggerDocument = require('./swagger.js');
           const swaggerUi = require('swagger-ui-express');
           const app = express()
-
           app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-        
+
+          async function auth(req, res) {
+            const { password } = req.body;
+            if (await argon2.verify(process.env.PASSWORD, password)) {
+              const token = jwt.sign({ userId: "iut_rh_parking" }, process.env.SECRET, { expiresIn: '365 days' });
+              return res.status(200).json({ access_token: token });
+            } else {
+              return res.status(404).json({ message: "password did not match" });
+            }
+          }
+
+          app.post("/auth", async (req, res) => {
+            const {token} = req.body;
+            if (token) return res.sendStatus(401);
+            await auth(req, res);
+          });
+
           const listPerPage = 3
 
           const db = {
@@ -39,7 +54,7 @@
            *     description: |
            *       Reserves a parking spot for the given license plate if the user is registered and has an active reservation.
            *     requestBody:
-           *       description: License plate number.
+           *       description: License plate number and jwt.
            *       required: true
            *       content:
            *         application/json:
@@ -47,6 +62,8 @@
            *             type: object
            *             properties:
            *               plate:
+           *                 type: string
+           *               access_token:
            *                 type: string
            *     responses:
            *       '204':
@@ -58,33 +75,40 @@
            */
           app.post('/parking', async function (req, res, next) {
             try {
-              const { plate } = req.body
-
-              let connection = await mysql.createConnection(db)
-              let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
-              if(rows.length > 0){
-                let current_date = Date.now();
-                let row = JSON.parse(JSON.stringify(rows[0]))
-  
-                if (new Date(row.until) >= current_date){
-                  const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
-  
-                  let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
-        
-                  //if is_disabled
-                  if(row.is_disabled) {
-                    await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
-                  // if not is_disabled
-                  } else {
-                    let i = 0;
-                    while (i < rows2.length) {i++}
-                    if(i === 0){i=1}
-                    await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
+             
+              const { plate, access_token } = req.body
+              if (!access_token) return res.sendStatus(401);
+              try {
+                const decoded = jwt.verify(access_token, process.env.SECRET);
+                console.log(decoded);
+                let connection = await mysql.createConnection(db)
+                let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
+                if(rows.length > 0){
+                  let current_date = Date.now();
+                  let row = JSON.parse(JSON.stringify(rows[0]))
+    
+                  if (new Date(row.until) >= current_date){
+                    const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
+    
+                    let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
+          
+                    //if is_disabled
+                    if(row.is_disabled) {
+                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
+                    // if not is_disabled
+                    } else {
+                      let i = 0;
+                      while (i < rows2.length) {i++}
+                      if(i === 0){i=1}
+                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
+                    }
+                    
                   }
-                  
                 }
+                return res.status(204).json({})
+              } catch {
+                return res.sendStatus(403);
               }
-              return res.status(204).json({})
             } catch (err) {
               next(err, req, res)
             }
