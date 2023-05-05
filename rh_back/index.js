@@ -70,7 +70,7 @@
                   const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
   
                   let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
-                  console.log(row.is_disabled);
+        
                   //if is_disabled
                   if(row.is_disabled) {
                     await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
