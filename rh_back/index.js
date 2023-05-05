@@ -309,7 +309,7 @@
                     license_2[i] = "O"
                   }
                 }
-                let license_2_mod = null
+                let license_2_mod = "NULL"
                 if(license_2.length !== 0) {
                   license_2_mod = license_2
                 }
