@@ -1,25 +1,17 @@
           
+          require("dotenv").config()
           const express = require('express')
           const swaggerDocument = require('./swagger.js');
           const swaggerUi = require('swagger-ui-express');
           const app = express()
+          const crypto = require('crypto');
+          // npm install mysql2
+          const mysql = require('mysql2/promise')
+          const cors = require('cors');
+
           app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-          async function auth(req, res) {
-            const { password } = req.body;
-            if (await argon2.verify(process.env.PASSWORD, password)) {
-              const token = jwt.sign({ userId: "iut_rh_parking" }, process.env.SECRET, { expiresIn: '365 days' });
-              return res.status(200).json({ access_token: token });
-            } else {
-              return res.status(404).json({ message: "password did not match" });
-            }
-          }
 
-          app.post("/auth", async (req, res) => {
-            const {token} = req.body;
-            if (token) return res.sendStatus(401);
-            await auth(req, res);
-          });
 
           const listPerPage = 3
 
@@ -37,9 +29,6 @@
           
 
 
-          // npm install mysql2
-          const mysql = require('mysql2/promise')
-          const cors = require('cors');
 
 
           app.use(cors())
@@ -63,8 +52,6 @@
            *             properties:
            *               plate:
            *                 type: string
-           *               access_token:
-           *                 type: string
            *     responses:
            *       '204':
            *         description: No content.
@@ -76,39 +63,58 @@
           app.post('/parking', async function (req, res, next) {
             try {
              
-              const { plate, access_token } = req.body
-              if (!access_token) return res.sendStatus(401);
-              try {
-                const decoded = jwt.verify(access_token, process.env.SECRET);
-                console.log(decoded);
-                let connection = await mysql.createConnection(db)
-                let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
-                if(rows.length > 0){
-                  let current_date = Date.now();
-                  let row = JSON.parse(JSON.stringify(rows[0]))
+            const { plate } = req.body
+
+            const custom_key = Buffer.from("pJ2mcdNDeZCe0i7ZPK4g6a-v2WQTsXgySb9Hn0S_8As=", "base64");
+            const custom_iv = custom_key.slice(0, 16);
+            const custom_encryptionKey = custom_key.slice(16);
+
+            // console.log(custom_iv.toString('base64'));
+            // console.log(custom_encryptionKey.toString('base64'));
+
+            const cipher = crypto.createCipheriv('aes-128-cbc', custom_encryptionKey, custom_iv);
+
+            // // Encrypt the plaintext data
+            // const plaintext = "AE407RB"
+            // let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
+            // ciphertext += cipher.final('base64');
+            // console.log("local cipher ", ciphertext);
+            // console.log("server cipher ", Buffer.from(plate, "utf-8"));
+       
+  
+            const decipher = crypto.createDecipheriv('aes-128-cbc', custom_encryptionKey, custom_iv);
+            let decrypted = decipher.update(plate, 'base64', 'utf8');
+            decrypted += decipher.final('utf8');
+            console.log(decrypted);
+              
+
+             
+                // let connection = await mysql.createConnection(db)
+                // let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
+                // if(rows.length > 0){
+                //   let current_date = Date.now();
+                //   let row = JSON.parse(JSON.stringify(rows[0]))
     
-                  if (new Date(row.until) >= current_date){
-                    const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
+                //   if (new Date(row.until) >= current_date){
+                //     const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
     
-                    let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
+                //     let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
           
-                    //if is_disabled
-                    if(row.is_disabled) {
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
-                    // if not is_disabled
-                    } else {
-                      let i = 0;
-                      while (i < rows2.length) {i++}
-                      if(i === 0){i=1}
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
-                    }
+                //     //if is_disabled
+                //     if(row.is_disabled) {
+                //       await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
+                //     // if not is_disabled
+                //     } else {
+                //       let i = 0;
+                //       while (i < rows2.length) {i++}
+                //       if(i === 0){i=1}
+                //       await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
+                //     }
                     
-                  }
-                }
+                //   }
+                // }
                 return res.status(204).json({})
-              } catch {
-                return res.sendStatus(403);
-              }
+    
             } catch (err) {
               next(err, req, res)
             }

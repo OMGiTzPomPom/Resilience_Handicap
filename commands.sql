@@ -71,7 +71,7 @@ DROP TABLE IF EXISTS parking;
 CREATE TABLE parking (
     id BIGINT(10) AUTO_INCREMENT,
     number TINYINT (1),
-    area VARCHAR (1) UNIQUE,
+    area VARCHAR (1),
     plate VARCHAR (7) UNIQUE,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB;
