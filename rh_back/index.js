@@ -241,7 +241,7 @@
            *                  type: string
            *                  description: Expiration date of the user's account
            *                  format: date
-           *               is_disabled:
+           *               disabled:
            *                  type: integer
            *                  description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -250,7 +250,7 @@
            *               license_2:
            *                  type: string
            *                  description: Second driver's license number
-           *               _days:
+           *               days:
            *                  type: object
            *                  description: Days of the week when the user is allowed to park
            *                  properties:
@@ -292,7 +292,7 @@
            */
           app.post('/users', async function (req, res, next) {
               try {
-                const {first_name, last_name, license_1, license_2, is_disabled, _days, until } = req.body
+                const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
                 for (let i = 0; i < license_1.length; i++) {
                      if ((i == 2 && license_1[i] === "O") || (i == 3 && license_1[i] === "O") || (i == 4 && license_1[i] === "O")){
                         license_1[i] = "0"
@@ -315,7 +315,7 @@
                 }
                 const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
                 const connection = await mysql.createConnection(db)
-                const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, is_disabled, _days, until])
+                const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, disabled, days, until])
                 return res.json(rows)
               } catch (err) {
                 next(err, req, res)
@@ -353,7 +353,7 @@
            *                 type: string
            *                 description: Expiration date of the user's account
            *                 format: date
-           *               is_disabled:
+           *               disabled:
            *                 type: integer
            *                 description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -362,7 +362,7 @@
            *               license_2:
            *                 type: string
            *                 description: Second driver's license number
-           *               _days:
+           *               days:
            *                 type: object
            *                 description: Days of the week when the user is allowed to park
            *                 properties:
@@ -408,7 +408,7 @@
            *                   type: string
            *                   description: Expiration date of the user's account
            *                   format: date
-           *                 is_disabled:
+           *                 disabled:
            *                   type: integer
            *                   description: Whether the user is disabled (0 for no, 1 for yes)
            *                 license_1:
@@ -417,7 +417,7 @@
            *                 license_2:
            *                   type: string
            *                   description: Second driver's license number
-           *                 _days:
+           *                 days:
            *                   type: object
            *                   description: Days of the week when the user is allowed to park
            *                   properties:
@@ -535,7 +535,7 @@
            *                         type: string
            *                         description: Expiration date of the user's account
            *                         format: date
-           *                       is_disabled:
+           *                       disabled:
            *                         type: integer
            *                         description: Whether the user is disabled (0 for no, 1 for yes)
            *                       license_1:
@@ -544,7 +544,7 @@
            *                       license_2:
            *                         type: string
            *                         description: Second driver's license number
-           *                       _days:
+           *                       days:
            *                         type: object
            *                         description: Days of the week when the user is allowed to park
            *                         properties:
@@ -648,7 +648,7 @@
            *                 type: string
            *                 description: Expiration date of the user's account
            *                 format: date
-           *               is_disabled:
+           *               disabled:
            *                 type: integer
            *                 description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -657,7 +657,7 @@
            *               license_2:
            *                 type: string
            *                 description: Second driver's license number
-           *               _days:
+           *               days:
            *                 type: object
            *                 description: Days of the week when the user is allowed to park
            *                 properties:
@@ -736,7 +736,7 @@
            *                 type: string
            *                 description: Expiration date of the user's account
            *                 format: date
-           *               is_disabled:
+           *               disabled:
            *                 type: integer
            *                 description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -745,7 +745,7 @@
            *               license_2:
            *                 type: string
            *                 description: Second driver's license number
-           *               _days:
+           *               days:
            *                 type: object
            *                 description: Days of the week when the user is allowed to park
            *                 properties:
@@ -828,7 +828,7 @@
            *                         type: string
            *                         description: Expiration date of the user's account
            *                         format: date
-           *                       is_disabled:
+           *                       disabled:
            *                         type: integer
            *                         description: Whether the user is disabled (0 for no, 1 for yes)
            *                       license_1:
@@ -837,7 +837,7 @@
            *                       license_2:
            *                         type: string
            *                         description: Second driver's license number
-           *                       _days:
+           *                       days:
            *                         type: object
            *                         description: Days of the week when the user is allowed to park
            *                         properties:
@@ -964,7 +964,7 @@
            *                         type: string
            *                         description: Expiration date of the user's account
            *                         format: date
-           *                       is_disabled:
+           *                       disabled:
            *                         type: integer
            *                         description: Whether the user is disabled (0 for no, 1 for yes)
            *                       license_1:
@@ -973,7 +973,7 @@
            *                       license_2:
            *                         type: string
            *                         description: Second driver's license number
-           *                       _days:
+           *                       days:
            *                         type: object
            *                         description: Days of the week when the user is allowed to park
            *                         properties:
