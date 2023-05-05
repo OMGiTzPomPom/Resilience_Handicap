@@ -76,14 +76,9 @@
                     await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
                   // if not is_disabled
                   } else {
-                    let i = 1;
-                    while (0 < rows2.length) {
-                      if( i === rows2.length ){
-                        i++
-                        break
-                      }
-                      i++
-                    }
+                    let i = 0;
+                    while (i < rows2.length) {i++}
+                    if(i === 0){i=1}
                     await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
                   }
                   
