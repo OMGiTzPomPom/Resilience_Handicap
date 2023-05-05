@@ -70,24 +70,21 @@
                   const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
   
                   let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
-  
+                  console.log(row.is_disabled);
                   //if is_disabled
                   if(row.is_disabled) {
-
-                    if(rows2.length > 0){
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [1, area, plate])
-                    }else{
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
-                    }
+                    await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
                   // if not is_disabled
                   } else {
-                    if(rows2.length > 0){
-                      let i = 0;
-                      while (i < rows2.length) {i++}
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
-                    }else{
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [2, area, plate])
+                    let i = 1;
+                    while (0 < rows2.length) {
+                      if( i === rows2.length ){
+                        i++
+                        break
+                      }
+                      i++
                     }
+                    await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
                   }
                   
                 }
@@ -296,13 +293,6 @@
           app.post('/users', async function (req, res, next) {
               try {
                 const {first_name, last_name, license_1, license_2, is_disabled, _days, until } = req.body
-
-                // console.log(req.body)
-
-                // license_1: 'ZE123ED'
-
-                // const test1 = license_1.slice(0, 1)
-
                 for (let i = 0; i < license_1.length; i++) {
                      if ((i == 2 && license_1[i] === "O") || (i == 3 && license_1[i] === "O") || (i == 4 && license_1[i] === "O")){
                         license_1[i] = "0"
@@ -319,12 +309,10 @@
                     license_2[i] = "O"
                   }
                 }
-                let license_2_mod = "NULL"
-                console.log(license_2.length);
+                let license_2_mod = null
                 if(license_2.length !== 0) {
                   license_2_mod = license_2
                 }
-                console.log(license_2_mod);
                 const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
                 const connection = await mysql.createConnection(db)
                 const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, is_disabled, _days, until])
@@ -464,11 +452,15 @@
           app.put('/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
-              const {first_name, last_name, license_1, license_2, is_disabled, _days, until } = req.body
+              const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
               const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `license_1` = ?, `license_2` = ?, `is_disabled` = ?, `_days` = ?, `until` = ? WHERE `id` = ?'
 
               const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, is_disabled, _days, until, id])
+              let license_2_mod = "NULL"
+              if(license_2.length !== 0) {
+                license_2_mod = license_2
+              }
+              const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, disabled, days, until, id])
               return res.json(rows[0])
             } catch (err) {
               next(err, req, res)
@@ -1064,7 +1056,9 @@
           app.use((err, req, res, next) => {
             const statusCode = err.statusCode || 500;
             console.error(err.message, err.stack);
-            return res.status(statusCode).json({ message: err.message });
+            //for debugging
+            //return res.status(statusCode).json({ message: err.message });
+            return res.status(statusCode).json({});
           })
 
           app.listen(3300)
