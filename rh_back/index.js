@@ -8,7 +8,11 @@
           // npm install mysql2
           const mysql = require('mysql2/promise')
           const cors = require('cors');
-
+          const basicAuth = require('express-basic-auth');
+          app.use('/docs', basicAuth({
+            users: { 'iut': 'iut' },
+            challenge: true
+          }));
           app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
