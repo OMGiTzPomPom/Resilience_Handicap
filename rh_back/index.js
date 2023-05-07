@@ -43,7 +43,7 @@
            *     description: |
            *       Reserves a parking spot for the given license plate if the user is registered and has an active reservation.
            *     requestBody:
-           *       description: License plate number and jwt.
+           *       description: License plate number encrypted in aes-128-cbc as base64 format.
            *       required: true
            *       content:
            *         application/json:
@@ -64,62 +64,90 @@
             try {
              
             const { plate } = req.body
-
-            const custom_key = Buffer.from("pJ2mcdNDeZCe0i7ZPK4g6a-v2WQTsXgySb9Hn0S_8As=", "base64");
-            const custom_iv = custom_key.slice(0, 16);
-            const custom_encryptionKey = custom_key.slice(16);
-
-            // console.log(custom_iv.toString('base64'));
-            // console.log(custom_encryptionKey.toString('base64'));
-
-            const cipher = crypto.createCipheriv('aes-128-cbc', custom_encryptionKey, custom_iv);
-
-            // // Encrypt the plaintext data
-            // const plaintext = "AE407RB"
-            // let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
-            // ciphertext += cipher.final('base64');
-            // console.log("local cipher ", ciphertext);
-            // console.log("server cipher ", Buffer.from(plate, "utf-8"));
-       
-  
-            const decipher = crypto.createDecipheriv('aes-128-cbc', custom_encryptionKey, custom_iv);
-            let decrypted = decipher.update(plate, 'base64', 'utf8');
-            decrypted += decipher.final('utf8');
-            console.log(decrypted);
-              
-
+            const python_key = Buffer.from(process.env.KEY, "base64")
+            const encryptionKey = python_key.slice(16);
+            const decodedToken = Buffer.from(plate, 'base64');
+            
+            const version = decodedToken.readUInt8(0);
+            const timestamp = decodedToken.readBigUInt64BE(1);
+            const iv = decodedToken.slice(9, 25);
+            const ciphertext = decodedToken.slice(25, -32);
+            const hmacSignature = decodedToken.slice(-32);
+            const decipher = crypto.createDecipheriv('aes-128-cbc', encryptionKey, iv);
+            let decrypted = decipher.update(ciphertext);
+            decrypted += decipher.final();
+            console.log(decrypted.toString())
              
-                // let connection = await mysql.createConnection(db)
-                // let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
-                // if(rows.length > 0){
-                //   let current_date = Date.now();
-                //   let row = JSON.parse(JSON.stringify(rows[0]))
-    
-                //   if (new Date(row.until) >= current_date){
-                //     const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
-    
-                //     let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
-          
-                //     //if is_disabled
-                //     if(row.is_disabled) {
-                //       await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
-                //     // if not is_disabled
-                //     } else {
-                //       let i = 0;
-                //       while (i < rows2.length) {i++}
-                //       if(i === 0){i=1}
-                //       await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
-                //     }
-                    
-                //   }
-                // }
-                return res.status(204).json({})
-    
+            let connection = await mysql.createConnection(db)
+            let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [decrypted.toString(), decrypted.toString()])
+            if(rows.length > 0){
+              let current_date = Date.now();
+              let row = JSON.parse(JSON.stringify(rows[0]))
+
+              if (new Date(row.until) >= current_date){
+                const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
+               
+     
+                if(row.is_disabled) {
+                  let [row, fields] = await connection.query("SELECT number FROM `parking` WHERE `area` = ? AND `is_disabled` = 1 AND `plate` = '' LIMIT 1", [area])
+
+                  if(row.length > 0){
+                    const sql = 'UPDATE parking SET `plate` = ? WHERE `area` = ? AND `number` = ? AND `is_disabled` = 1'
+                    await connection.execute(sql, [decrypted.toString(), area, row[0].number])
+                  }
+
+                } else {
+                  let [row, fields] = await connection.query("SELECT number FROM `parking` WHERE `area` = ? AND `is_disabled` = 0 AND `plate` = '' LIMIT 1", [area])
+
+                  if(row.length > 0){
+                    const sql = 'UPDATE parking SET `plate` = ? WHERE `area` = ? AND `number` = ? AND `is_disabled` = 0'
+                    await connection.execute(sql, [decrypted.toString(), area, row[0].number])
+                  }
+                }
+                
+              }
+            }
+            return res.status(204).json({})
             } catch (err) {
               next(err, req, res)
             }
           })
-          
+
+         /**
+         * @openapi
+         * /parking/{plate}:
+         *   patch:
+         *     summary: Patch a parking reservation.
+         *     description: |
+         *       Removes a parking spot for the given license plate.
+         *     parameters:
+         *       - name: plate
+         *         in: path
+         *         required: true
+         *         description: License plate number.
+         *         schema:
+         *           type: string
+         *     responses:
+         *       '204':
+         *         description: No content.
+         *       '400':
+         *         description: Bad request.
+         *       '500':
+         *         description: Internal server error.
+         */
+         app.patch('/parking/:plate', async function (req, res, next) {
+          try {
+            const { plate } = req.params
+            let connection = await mysql.createConnection(db)
+            //if someone is leaving parking
+            const message = await connection.execute('UPDATE `parking` SET `plate` = ? WHERE `plate` = ?', ['', plate])
+            console.log(message);
+            return res.status(204).json({})
+          } catch (err) {
+            next(err, req, res)
+          }
+        })
+
         /**
          * @openapi
          * /parking/{plate}:
@@ -154,6 +182,56 @@
               next(err, req, res)
             }
           })
+
+          /**
+           * @openapi
+           * /spot:
+           *   post:
+           *     summary: Add a new parking spot
+           *     description: Add a new spot to the system
+           *     requestBody:
+           *       required: true
+           *       content:
+           *         application/json:
+           *           schema:
+           *             type: object
+           *             properties:
+           *               number:
+           *                  type: string
+           *                  description: Parking number
+           *               area:
+           *                  type: string
+           *                  description: Parking area
+           *               disabled:
+           *                  type: integer
+           *                  description: Whether the spot is disabled (0 for no, 1 for yes)
+           *     responses:
+           *       200:
+           *         description: The newly added spot
+           *         content:
+           *           application/json:
+           *             schema:
+           *               type: object
+           *               properties:
+           *                 affectedRows:
+           *                   type: integer
+           *                   description: The number of affected rows
+           *                 insertId:
+           *                   type: integer
+           *                   description: The ID of the newly inserted spot
+           */
+          app.post('/spot', async function (req, res, next) {
+            try {
+              const { number, area, disabled } = req.body
+              const sql = 'INSERT INTO parking (number, area, is_disabled) VALUES (?,?,?)'
+              const connection = await mysql.createConnection(db)
+              const [rows, fields] = await connection.execute(sql, [number, area, disabled])
+              return res.json(rows)
+            } catch (err) {
+              next(err, req, res)
+            }
+        })
+
           /**
            * @openapi
            * /spot:
@@ -219,9 +297,14 @@
            *                     type: object
            *                     properties:
            *                       number:
-           *                         type: integer
+           *                         type: string
+           *                         description: Parking number
            *                       area:
            *                         type: string
+           *                         description: Area for parking
+           *                       disabled:
+           *                         type: integer
+           *                         description: Whether the spot is for disabled (0 for no, 1 for yes)
            *                       plate:
            *                         type: string
            *                   description: A list of parking spots.
@@ -236,7 +319,7 @@
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
               const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.query("SELECT number, area, plate FROM `parking` LIMIT ?,?", [ offset, 9])
+              const [rows, fields] = await connection.query("SELECT number, area, is_disabled, plate FROM `parking` LIMIT ?,?", [ offset, 9])
               return res.json({"parking":rows, page})
             } catch (err) {
               next(err, req, res)
