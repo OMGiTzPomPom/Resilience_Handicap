@@ -9,10 +9,19 @@
           const mysql = require('mysql2/promise')
           const cors = require('cors');
           const basicAuth = require('express-basic-auth');
+          const fs = require('fs');
+
+          const sslOptions = {
+            cert: fs.readFileSync('client-cert.pem'),
+            key: fs.readFileSync('client-key.pem'),
+            rejectUnauthorized: false
+          };
+
           app.use('/docs', basicAuth({
-            users: { 'iut': 'iut' },
+            users: { 'root': 'root' },
             challenge: true
           }));
+
           app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
@@ -82,7 +91,13 @@
             decrypted += decipher.final();
             console.log(decrypted.toString())
              
-            let connection = await mysql.createConnection(db)
+            let connection = await mysql.createConnection(db, {
+              host: 'localhost',
+              user: 'root',
+              password: 'root',
+              database: 'mydb',
+              ssl: sslOptions
+            })
             let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [decrypted.toString(), decrypted.toString()])
             if(rows.length > 0){
               let current_date = Date.now();
@@ -142,7 +157,13 @@
          app.patch('/parking/:plate', async function (req, res, next) {
           try {
             const { plate } = req.params
-            let connection = await mysql.createConnection(db)
+            let connection = await mysql.createConnection(db, {
+              host: 'localhost',
+              user: 'root',
+              password: 'root',
+              database: 'mydb',
+              ssl: sslOptions
+            })
             //if someone is leaving parking
             const message = await connection.execute('UPDATE `parking` SET `plate` = ? WHERE `plate` = ?', ['', plate])
             console.log(message);
@@ -177,7 +198,13 @@
           app.delete('/parking/:plate', async function (req, res, next) {
             try {
               const { plate } = req.params
-              let connection = await mysql.createConnection(db)
+              let connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               //if someone is leaving parking
               const message = await connection.execute('DELETE FROM `parking` WHERE `plate` = ?', [plate])
               console.log(message);
@@ -228,7 +255,13 @@
             try {
               const { number, area, disabled } = req.body
               const sql = 'INSERT INTO parking (number, area, is_disabled) VALUES (?,?,?)'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.execute(sql, [number, area, disabled])
               return res.json(rows)
             } catch (err) {
@@ -255,7 +288,13 @@
            */
           app.get('/spot', async function (req, res, next) {
             try {
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.query("SELECT number, area FROM `parking` LIMIT 1")
               let row = JSON.parse(JSON.stringify(rows[0]))
               let string = ""
@@ -322,7 +361,13 @@
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.query("SELECT number, area, is_disabled, plate FROM `parking` LIMIT ?,?", [ offset, 9])
               return res.json({"parking":rows, page})
             } catch (err) {
@@ -426,7 +471,13 @@
                   license_2_mod = license_2
                 }
                 const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
-                const connection = await mysql.createConnection(db)
+                const connection = await mysql.createConnection(db, {
+                  host: 'localhost',
+                  user: 'root',
+                  password: 'root',
+                  database: 'mydb',
+                  ssl: sslOptions
+                })
                 const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, disabled, days, until])
                 return res.json(rows)
               } catch (err) {
@@ -567,7 +618,13 @@
               const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
               const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `license_1` = ?, `license_2` = ?, `is_disabled` = ?, `_days` = ?, `until` = ? WHERE `id` = ?'
 
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let license_2_mod = "NULL"
               if(license_2.length !== 0) {
                 license_2_mod = license_2
@@ -602,7 +659,13 @@
             try {
               const {id} = req.params
               const sql = 'DELETE FROM `users` WHERE `id` = ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.execute(sql, [id])
               return res.json(rows[0])
             } catch (err) {
@@ -688,7 +751,13 @@
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` LIMIT ?,?"
               let [rows, fields] = await connection.query(sql, [offset, listPerPage])
               return res.json({"users":rows, page})
@@ -717,7 +786,13 @@
            */
           app.get('/users/total', async function (req, res, next) {
             try {
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let sql = "SELECT COUNT(users.id) AS total FROM `users`"
               let [rows, fields] = await connection.query(sql, [])
               return res.json({"total": rows[0].total})
@@ -803,7 +878,13 @@
             try {
               const {id} = req.params
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `id` = ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.execute(sql, [id])
               if(rows.length > 0){
                 return res.json(rows[0])
@@ -887,7 +968,13 @@
            */
           app.get('/user/license/:license', async function (req, res, next) {
             const {license} = req.params
-            const connection = await mysql.createConnection(db)
+            const connection = await mysql.createConnection(db, {
+              host: 'localhost',
+              user: 'root',
+              password: 'root',
+              database: 'mydb',
+              ssl: sslOptions
+            })
             let [rows, fields] = await connection.query("SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [license, license])
             if(rows.length > 0){
               return res.json(rows[0])
@@ -986,7 +1073,13 @@
 
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
 
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.query(sql, [first_name + "%", offset, listPerPage])
               return res.json({"users": rows, page})
             } catch (err) {
@@ -1024,7 +1117,13 @@
             try {
               const {first_name} = req.params
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let [rows, fields] = await connection.query(sql, [first_name + "%"])
               return res.json({"total": rows[0].total})
             } catch (err) {
@@ -1120,7 +1219,13 @@
               const offset = getOffset(page, listPerPage)
               const {last_name} = req.params
               let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?"
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let [rows, fields] = await connection.query(sql, [last_name + "%", offset, listPerPage])
               return res.json({"users":rows, page})
             } catch (err) {
@@ -1156,7 +1261,13 @@
             try {
               const {last_name} = req.params
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let [rows, fields] = await connection.query(sql, [last_name + "%"])
               return res.json({"total": rows[0].total})
             } catch (err) {
