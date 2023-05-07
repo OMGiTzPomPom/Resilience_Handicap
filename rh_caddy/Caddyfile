@@ -1,5 +1,22 @@
 localhost {
-    root * /srv/
-    file_server
-    reverse_proxy localhost:3300
+    handle {
+        root * /srv/
+        file_server
+    }
+
+    handle_path /api/* {
+        uri strip_prefix /api
+        reverse_proxy backend:3300 {
+            header_down Strict-Transport-Security max-age=31536000;
+        }
+    }
+    handle_path /docs* {
+        # basicauth {
+        #     iut aXV0
+        # }
+        uri strip_prefix /docs
+        reverse_proxy backend:3300/docs {
+            header_down Strict-Transport-Security max-age=31536000;
+        }
+    }
 }
