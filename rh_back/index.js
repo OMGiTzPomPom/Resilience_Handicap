@@ -18,7 +18,7 @@
             rejectUnauthorized: false
           };
 
-          app.use('/docs', basicAuth({
+          app.use('/api/docs', basicAuth({
             users: { 'root': 'root' },
             challenge: true
           }), swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -73,7 +73,7 @@
            *       '500':
            *         description: Internal server error.
            */
-          app.post('/parking', async function (req, res, next) {
+          app.post('/api/parking', async function (req, res, next) {
             try {
              
             const { plate } = req.body
@@ -218,7 +218,7 @@
          *       '500':
          *         description: Internal server error.
          */
-         app.patch('/parking/:plate', async function (req, res, next) {
+         app.patch('/api/parking/:plate', async function (req, res, next) {
           try {
             const { plate } = req.params
             let connection = await mysql.createConnection(db, {
@@ -259,7 +259,7 @@
          *       '500':
          *         description: Internal server error.
          */
-          app.delete('/parking/:plate', async function (req, res, next) {
+          app.delete('/api/parking/:plate', async function (req, res, next) {
             try {
               const { plate } = req.params
               let connection = await mysql.createConnection(db, {
@@ -315,7 +315,7 @@
            *                   type: integer
            *                   description: The ID of the newly inserted spot
            */
-          app.post('/spot', async function (req, res, next) {
+          app.post('/api/spot', async function (req, res, next) {
             try {
               const { number, area, disabled } = req.body
               const sql = 'INSERT INTO parking (number, area, is_disabled) VALUES (?,?,?)'
@@ -377,7 +377,7 @@
            *       '500':
            *          description: Internal server error
            */
-          app.get('/parking', async function (req, res, next) {
+          app.get('/api/parking', async function (req, res, next) {
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
@@ -467,7 +467,7 @@
            *                   type: integer
            *                   description: The ID of the newly inserted user
            */
-          app.post('/users', async function (req, res, next) {
+          app.post('/api/users', async function (req, res, next) {
               try {
                 const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
                 for (let i = 0; i < license_1.length; i++) {
@@ -632,7 +632,7 @@
            *       '500':
            *         description: Internal server error
            */
-          app.put('/user/:id', async function (req, res, next) {
+          app.put('/api/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
               const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
@@ -675,7 +675,7 @@
            *       500:
            *         description: Internal server error
            */
-          app.delete('/user/:id', async function (req, res, next) {
+          app.delete('/api/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
               const sql = 'DELETE FROM `users` WHERE `id` = ?'
@@ -767,7 +767,7 @@
            *                 page:
            *                   type: integer
            */
-          app.get('/users', async function (req, res, next) {
+          app.get('/api/users', async function (req, res, next) {
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
@@ -804,7 +804,7 @@
            *                   type: integer
            *                   description: The total number of users.
            */
-          app.get('/users/total', async function (req, res, next) {
+          app.get('/api/users/total', async function (req, res, next) {
             try {
               const connection = await mysql.createConnection(db, {
                 host: 'localhost',
@@ -894,7 +894,7 @@
            *       500:
            *         description: Internal server error.
            */
-          app.get('/user/:id', async function (req, res, next) {
+          app.get('/api/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `id` = ?'
@@ -986,7 +986,7 @@
            *       '404':
            *         description: User not found
            */
-          app.get('/user/license/:license', async function (req, res, next) {
+          app.get('/api/user/license/:license', async function (req, res, next) {
             const {license} = req.params
             const connection = await mysql.createConnection(db, {
               host: 'localhost',
@@ -1085,7 +1085,7 @@
            *                   type: integer
            *                   description: Page number of the response
            */
-          app.get('/users/first_name/:first_name', async function (req, res, next) {
+          app.get('/api/users/first_name/:first_name', async function (req, res, next) {
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
@@ -1133,7 +1133,7 @@
            *       '500':
            *         description: Internal server error
            */
-          app.get('/users/first_name/total/:first_name', async function (req, res, next) {
+          app.get('/api/users/first_name/total/:first_name', async function (req, res, next) {
             try {
               const {first_name} = req.params
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ?'
@@ -1233,7 +1233,7 @@
            *                   type: integer
            *                   description: Page number of the response
            */
-          app.get('/users/last_name/:last_name', async function (req, res, next) {
+          app.get('/api/users/last_name/:last_name', async function (req, res, next) {
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
@@ -1277,7 +1277,7 @@
            *                   type: integer
            *                   example: 42
            */
-          app.get('/users/last_name/total/:last_name', async function (req, res, next) {
+          app.get('/api/users/last_name/total/:last_name', async function (req, res, next) {
             try {
               const {last_name} = req.params
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ?'
