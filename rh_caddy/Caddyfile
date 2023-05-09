@@ -1,11 +1,13 @@
 localhost {
+    @deny not remote_ip 172.20.0.0/14
+    respond @deny "Access Denied" 403
     encode zstd gzip
     root * /srv/
     file_server
-    basicauth {
-	    root $2a$14$5Kxi.TUqqJ1prPytMEscSOszZ3R0/j5dfTMQ9TqP6INDgusgmQ97y
-    }
     reverse_proxy /api/* backend:3300 {
-        trusted_proxies 134.59.143.110/24
-    }  
+        trusted_proxies 172.20.0.0/14
+    }
+    basicauth {
+        root $2a$14$5Kxi.TUqqJ1prPytMEscSOszZ3R0/j5dfTMQ9TqP6INDgusgmQ97y
+    }
 }
