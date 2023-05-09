@@ -21,9 +21,7 @@
           app.use('/docs', basicAuth({
             users: { 'root': 'root' },
             challenge: true
-          }));
-
-          app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+          }), swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 
