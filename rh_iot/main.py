@@ -107,6 +107,7 @@ class Parking(BaseModel):
 @app.post("/place")
 def toto(parking: Parking):
     p = parking.dict()
+    pathToArea(p)
     return p["area"]
 
 #/************************************
