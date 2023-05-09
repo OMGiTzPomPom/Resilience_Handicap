@@ -25,5 +25,5 @@ def toto(parking: Parking):
     p = parking.dict()
     return {"Parking ": p}
 
-if name == "main":
+if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=9090)
