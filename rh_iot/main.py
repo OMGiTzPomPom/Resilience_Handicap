@@ -23,7 +23,7 @@ class Parking(BaseModel):
 @app.post("/place")
 def toto(parking: Parking):
     p = parking.dict()
-    return {"Parking ": p}
+    return p["area"]
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=9090)
