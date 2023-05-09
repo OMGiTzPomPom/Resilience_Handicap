@@ -115,28 +115,22 @@ def pathToArea(p):
     area = p["area"]
     place = p["place"]
     if area == "a":
+        resetLed()
         GPIO.output(gate, GPIO.LOW)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
         GPIO.output(w3, GPIO.HIGH)
-        GPIO.output(w4, GPIO.LOW)
-        GPIO.output(w5, GPIO.LOW)
-        GPIO.output(w6, GPIO.LOW)
-        GPIO.output(w7, GPIO.LOW)
-        GPIO.output(w8, GPIO.LOW)
-
+        
         if place == "0" :
             GPIO.output(a0, GPIO.HIGH)
-            GPIO.output(a1, GPIO.LOW)
         elif place == "1" :
-            GPIO.output(a0, GPIO.LOW)
             GPIO.output(a1, GPIO.HIGH)
         else :
-            GPIO.output(a0, GPIO.LOW)
-            GPIO.output(a1, GPIO.LOW)
+            pass
 
     elif area == "b":
+        resetLed()
         GPIO.output(gate, GPIO.LOW)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
@@ -145,20 +139,16 @@ def pathToArea(p):
         GPIO.output(w4, GPIO.HIGH)
         GPIO.output(w5, GPIO.HIGH)
         GPIO.output(w6, GPIO.HIGH)
-        GPIO.output(w7, GPIO.LOW)
-        GPIO.output(w8, GPIO.LOW)
 
         if place == "0" :
             GPIO.output(b0, GPIO.HIGH)
-            GPIO.output(b1, GPIO.LOW)
         elif place == "1" :
-            GPIO.output(b0, GPIO.LOW)
             GPIO.output(b1, GPIO.HIGH)
         else :
-            GPIO.output(b0, GPIO.LOW)
-            GPIO.output(b1, GPIO.LOW)
+            pass
 
     elif area == "c":
+        resetLed()
         GPIO.output(gate, GPIO.LOW)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
@@ -169,35 +159,33 @@ def pathToArea(p):
         GPIO.output(w6, GPIO.HIGH)
         GPIO.output(w7, GPIO.HIGH)
         GPIO.output(w8, GPIO.HIGH)
-
         if place == "0" :
             GPIO.output(c0, GPIO.HIGH)
-            GPIO.output(c1, GPIO.LOW)
         elif place == "1" :
-            GPIO.output(c0, GPIO.LOW)
             GPIO.output(c1, GPIO.HIGH)
         else :
-            GPIO.output(c0, GPIO.LOW)
-            GPIO.output(c1, GPIO.LOW)
+            pass
 
     else:
         GPIO.output(gate, GPIO.HIGH)
-        GPIO.output(w0, GPIO.LOW)
-        GPIO.output(w1, GPIO.LOW)
-        GPIO.output(w2, GPIO.LOW)
-        GPIO.output(w3, GPIO.LOW)
-        GPIO.output(w4, GPIO.LOW)
-        GPIO.output(w5, GPIO.LOW)
-        GPIO.output(w6, GPIO.LOW)
-        GPIO.output(w7, GPIO.LOW)
-        GPIO.output(w8, GPIO.LOW)
-        GPIO.output(a0, GPIO.LOW)
-        GPIO.output(a1, GPIO.LOW)
-        GPIO.output(b0, GPIO.LOW)
-        GPIO.output(b1, GPIO.LOW)
-        GPIO.output(c0, GPIO.LOW)
-        GPIO.output(c1, GPIO.LOW)
+        resetLed()
 
+def resetLed() :
+    GPIO.output(w0, GPIO.LOW)
+    GPIO.output(w1, GPIO.LOW)
+    GPIO.output(w2, GPIO.LOW)
+    GPIO.output(w3, GPIO.LOW)
+    GPIO.output(w4, GPIO.LOW)
+    GPIO.output(w5, GPIO.LOW)
+    GPIO.output(w6, GPIO.LOW)
+    GPIO.output(w7, GPIO.LOW)
+    GPIO.output(w8, GPIO.LOW)
+    GPIO.output(a0, GPIO.LOW)
+    GPIO.output(a1, GPIO.LOW)
+    GPIO.output(b0, GPIO.LOW)
+    GPIO.output(b1, GPIO.LOW)
+    GPIO.output(c0, GPIO.LOW)
+    GPIO.output(c1, GPIO.LOW)
 
 #/************************************
 # *             For API              *
