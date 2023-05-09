@@ -105,7 +105,7 @@ class Parking(BaseModel):
 def toto(parking: Parking):
     p = parking.dict()
     pathToArea(p)
-    return p["area"]
+    return p
 
 #/************************************
 # *           Led function           *
@@ -121,7 +121,7 @@ def pathToArea(p):
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
         GPIO.output(w3, GPIO.HIGH)
-        
+
         if place == "0" :
             GPIO.output(a0, GPIO.HIGH)
         elif place == "1" :
