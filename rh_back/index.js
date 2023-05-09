@@ -1,5 +1,6 @@
           
           require("dotenv").config()
+          const http = require('http');
           const express = require('express')
           const swaggerDocument = require('./swagger.js');
           const swaggerUi = require('swagger-ui-express');
@@ -39,6 +40,7 @@
             return (currentPage - 1) * [listPerPage]
           }
 
+          
           
 
 
@@ -99,28 +101,92 @@
               ssl: sslOptions
             })
             let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [decrypted.toString(), decrypted.toString()])
+
             if(rows.length > 0){
               let current_date = Date.now();
               let row = JSON.parse(JSON.stringify(rows[0]))
 
               if (new Date(row.until) >= current_date){
                 const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
-               
-     
                 if(row.is_disabled) {
                   let [row, fields] = await connection.query("SELECT number FROM `parking` WHERE `area` = ? AND `is_disabled` = 1 AND `plate` = '' LIMIT 1", [area])
-
+   
                   if(row.length > 0){
                     const sql = 'UPDATE parking SET `plate` = ? WHERE `area` = ? AND `number` = ? AND `is_disabled` = 1'
                     await connection.execute(sql, [decrypted.toString(), area, row[0].number])
-                  }
+                    try {
+                      const postData = JSON.stringify({
+                        area: area,
+                        place: row[0].number
+                      });
+                        const options = {
+                            host: '192.168.143.68',
+                            port: 9090,
+                            path: '/place',
+                            method: 'POST',
+                            headers: {
+                            'Content-Type': 'application/json',
+                            'Content-Length': postData.length
+                            }
+                        };
+                        const req = http.request(options, (res) => {
+                          console.log(`statusCode: ${res.statusCode}`);
+ 
+                          res.on('data', function (data) {
+                            process.stdout.write(data)
+                
+                          });
 
+                      });
+                      req.on('error', function (error) {
+                        console.log(error);
+                      });
+                      req.write(postData);
+                      req.end();
+                    } catch (error) {
+                      console.log(error);
+                    }
+                  }
+              
                 } else {
                   let [row, fields] = await connection.query("SELECT number FROM `parking` WHERE `area` = ? AND `is_disabled` = 0 AND `plate` = '' LIMIT 1", [area])
-
+        
                   if(row.length > 0){
                     const sql = 'UPDATE parking SET `plate` = ? WHERE `area` = ? AND `number` = ? AND `is_disabled` = 0'
                     await connection.execute(sql, [decrypted.toString(), area, row[0].number])
+                    try {
+
+                    //  curl -X POST -H "Content-Type: application/json" -d '{"area":"a","place":"0"}' 192.168.143.68:9090/place
+                    const postData = JSON.stringify({
+                      area: area,
+                      place: row[0].number
+                    });
+                    const options = {
+                      host: '192.168.143.68',
+                      port: 9090,
+                      path: '/place',
+                      method: 'POST',
+                      headers: {
+                      'Content-Type': 'application/json',
+                      'Content-Length': postData.length
+                      }
+                  };
+                        const req = http.request(options, (res) => {
+                          console.log(`statusCode: ${res.statusCode}`);
+ 
+                          res.on('data', function (data) {
+                            process.stdout.write(data)
+                
+                          });
+                          res.on('error', function (error) {
+                              console.log(error);
+                          });
+                      });
+                      req.write(postData);
+                      req.end();
+                    } catch (error) {
+                      console.log(error);
+                    }
                   }
                 }
                 
@@ -268,50 +334,6 @@
               next(err, req, res)
             }
         })
-
-          /**
-           * @openapi
-           * /spot:
-           *   get:
-           *     summary: Get parking spot
-           *     description: Returns parking spot with their respective area.
-           *     responses:
-           *       '200':
-           *         description: Returns area and a parking number
-           *         content:
-           *           text/plain:
-           *             schema:
-           *                type: string
-           *                example: a1
-           *       '500':
-           *          description: Internal server error
-           */
-          app.get('/spot', async function (req, res, next) {
-            try {
-              const connection = await mysql.createConnection(db, {
-                host: 'localhost',
-                user: 'root',
-                password: 'root',
-                database: 'mydb',
-                ssl: sslOptions
-              })
-              const [rows, fields] = await connection.query("SELECT number, area FROM `parking` LIMIT 1")
-              let row = JSON.parse(JSON.stringify(rows[0]))
-              let string = ""
-              string += row.area
-              string += row.number
-              const message = await connection.execute('DELETE FROM `parking` WHERE `number` = ? AND `area` = ?', [row.number, row.area])
-              if(message[0]["affectedRows"] > 0){
-                res.type('text/plain')
-                return res.send(string)
-              }else{
-                return res.send("")
-              }
- 
-            } catch (err) {
-              next(err, req, res)
-            }
-          })
 
           /**
            * @openapi
