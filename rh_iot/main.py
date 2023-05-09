@@ -72,7 +72,7 @@ GPIO.setup(c0, GPIO.OUT)
 GPIO.setup(c1, GPIO.OUT)
 
 #set to off on init
-GPIO.output(gate, GPIO.LOW)
+GPIO.output(gate, GPIO.HIGH)
 GPIO.output(w0, GPIO.LOW)
 GPIO.output(w1, GPIO.LOW)
 GPIO.output(w2, GPIO.LOW)
@@ -115,6 +115,7 @@ def pathToArea(p):
     area = p["area"]
     place = p["place"]
     if area == "a":
+        GPIO.output(gate, GPIO.LOW)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
@@ -136,6 +137,7 @@ def pathToArea(p):
             GPIO.output(a1, GPIO.LOW)
 
     elif area == "b":
+        GPIO.output(gate, GPIO.LOW)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
@@ -147,16 +149,17 @@ def pathToArea(p):
         GPIO.output(w8, GPIO.LOW)
 
         if place == "0" :
-            GPIO.output(a0, GPIO.HIGH)
-            GPIO.output(a1, GPIO.LOW)
+            GPIO.output(b0, GPIO.HIGH)
+            GPIO.output(b1, GPIO.LOW)
         elif place == "1" :
-            GPIO.output(a0, GPIO.LOW)
-            GPIO.output(a1, GPIO.HIGH)
+            GPIO.output(b0, GPIO.LOW)
+            GPIO.output(b1, GPIO.HIGH)
         else :
-            GPIO.output(a0, GPIO.LOW)
-            GPIO.output(a1, GPIO.LOW)
+            GPIO.output(b0, GPIO.LOW)
+            GPIO.output(b1, GPIO.LOW)
 
     elif area == "c":
+        GPIO.output(gate, GPIO.LOW)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
@@ -168,17 +171,17 @@ def pathToArea(p):
         GPIO.output(w8, GPIO.HIGH)
 
         if place == "0" :
-            GPIO.output(a0, GPIO.HIGH)
-            GPIO.output(a1, GPIO.LOW)
+            GPIO.output(c0, GPIO.HIGH)
+            GPIO.output(c1, GPIO.LOW)
         elif place == "1" :
-            GPIO.output(a0, GPIO.LOW)
-            GPIO.output(a1, GPIO.HIGH)
+            GPIO.output(c0, GPIO.LOW)
+            GPIO.output(c1, GPIO.HIGH)
         else :
-            GPIO.output(a0, GPIO.LOW)
-            GPIO.output(a1, GPIO.LOW)
+            GPIO.output(c0, GPIO.LOW)
+            GPIO.output(c1, GPIO.LOW)
 
     else:
-        GPIO.output(gate, GPIO.LOW)
+        GPIO.output(gate, GPIO.HIGH)
         GPIO.output(w0, GPIO.LOW)
         GPIO.output(w1, GPIO.LOW)
         GPIO.output(w2, GPIO.LOW)
