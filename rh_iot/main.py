@@ -39,13 +39,12 @@ w5 = 38
 w6 = 40
 w7 = 7
 w8 = 11
-w9 = 13
-a0 = 15
-a1 = 29
-b0 = 31
-b1 = 33
-c0 = 35
-c1 = 37
+a1 = 13
+a0 = 29
+b1 = 31
+b0 = 33
+c1 = 35
+c0 = 37
 
 #/************************************
 # *               GPIO               *
@@ -65,7 +64,6 @@ GPIO.setup(w5, GPIO.OUT)
 GPIO.setup(w6, GPIO.OUT)
 GPIO.setup(w7, GPIO.OUT)
 GPIO.setup(w8, GPIO.OUT)
-GPIO.setup(w9, GPIO.OUT)
 GPIO.setup(a0, GPIO.OUT)
 GPIO.setup(a1, GPIO.OUT)
 GPIO.setup(b0, GPIO.OUT)
@@ -84,7 +82,6 @@ GPIO.output(w5, GPIO.LOW)
 GPIO.output(w6, GPIO.LOW)
 GPIO.output(w7, GPIO.LOW)
 GPIO.output(w8, GPIO.LOW)
-GPIO.output(w9, GPIO.LOW)
 GPIO.output(a0, GPIO.LOW)
 GPIO.output(a1, GPIO.LOW)
 GPIO.output(b0, GPIO.LOW)
@@ -116,8 +113,8 @@ def toto(parking: Parking):
 
 def pathToArea(p):
     area = p["area"]
+    place = p["place"]
     if area == "a":
-        print(area)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
@@ -127,9 +124,18 @@ def pathToArea(p):
         GPIO.output(w6, GPIO.LOW)
         GPIO.output(w7, GPIO.LOW)
         GPIO.output(w8, GPIO.LOW)
-        GPIO.output(w9, GPIO.LOW)
+
+        if place == "0" :
+            GPIO.output(a0, GPIO.HIGH)
+            GPIO.output(a1, GPIO.LOW)
+        elif place == "1" :
+            GPIO.output(a0, GPIO.LOW)
+            GPIO.output(a1, GPIO.HIGH)
+        else :
+            GPIO.output(a0, GPIO.LOW)
+            GPIO.output(a1, GPIO.LOW)
+
     elif area == "b":
-        print(area)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
@@ -139,9 +145,18 @@ def pathToArea(p):
         GPIO.output(w6, GPIO.HIGH)
         GPIO.output(w7, GPIO.LOW)
         GPIO.output(w8, GPIO.LOW)
-        GPIO.output(w9, GPIO.LOW)
+
+        if place == "0" :
+            GPIO.output(a0, GPIO.HIGH)
+            GPIO.output(a1, GPIO.LOW)
+        elif place == "1" :
+            GPIO.output(a0, GPIO.LOW)
+            GPIO.output(a1, GPIO.HIGH)
+        else :
+            GPIO.output(a0, GPIO.LOW)
+            GPIO.output(a1, GPIO.LOW)
+
     elif area == "c":
-        print(area)
         GPIO.output(w0, GPIO.HIGH)
         GPIO.output(w1, GPIO.HIGH)
         GPIO.output(w2, GPIO.HIGH)
@@ -151,7 +166,35 @@ def pathToArea(p):
         GPIO.output(w6, GPIO.HIGH)
         GPIO.output(w7, GPIO.HIGH)
         GPIO.output(w8, GPIO.HIGH)
-        GPIO.output(w9, GPIO.HIGH)
+
+        if place == "0" :
+            GPIO.output(a0, GPIO.HIGH)
+            GPIO.output(a1, GPIO.LOW)
+        elif place == "1" :
+            GPIO.output(a0, GPIO.LOW)
+            GPIO.output(a1, GPIO.HIGH)
+        else :
+            GPIO.output(a0, GPIO.LOW)
+            GPIO.output(a1, GPIO.LOW)
+
+    else:
+        GPIO.output(gate, GPIO.LOW)
+        GPIO.output(w0, GPIO.LOW)
+        GPIO.output(w1, GPIO.LOW)
+        GPIO.output(w2, GPIO.LOW)
+        GPIO.output(w3, GPIO.LOW)
+        GPIO.output(w4, GPIO.LOW)
+        GPIO.output(w5, GPIO.LOW)
+        GPIO.output(w6, GPIO.LOW)
+        GPIO.output(w7, GPIO.LOW)
+        GPIO.output(w8, GPIO.LOW)
+        GPIO.output(a0, GPIO.LOW)
+        GPIO.output(a1, GPIO.LOW)
+        GPIO.output(b0, GPIO.LOW)
+        GPIO.output(b1, GPIO.LOW)
+        GPIO.output(c0, GPIO.LOW)
+        GPIO.output(c1, GPIO.LOW)
+
 
 #/************************************
 # *             For API              *
