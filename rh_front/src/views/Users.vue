@@ -46,7 +46,7 @@ const getAllUsers = async (e) => {
     page = ref(1);
     total = ref(0);
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/users/total`, settingsGet);
+        const fetchResponse = await fetch(`/api/users/total`, settingsGet);
         const data = await fetchResponse.json();
         console.log(data)
         total.value = data.total
@@ -55,7 +55,7 @@ const getAllUsers = async (e) => {
     }
 
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/users`, settingsGet);
+        const fetchResponse = await fetch(`/api/users`, settingsGet);
         const data = await fetchResponse.json();
         users.splice(0);
         data.users.forEach(el => {
@@ -72,7 +72,7 @@ const searchByFirstName = async (e) => {
     formSearch.lastname = ""
     formSearch.license = ""
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/users/first_name/total/${formSearch.firstname}`, settingsGet);
+        const fetchResponse = await fetch(`/api/users/first_name/total/${formSearch.firstname}`, settingsGet);
         const data = await fetchResponse.json();
 
         total.value = data.total
@@ -80,7 +80,7 @@ const searchByFirstName = async (e) => {
         console.log(error);
     }
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/users/first_name/${formSearch.firstname}/?page=${page.value}`, settingsGet);
+        const fetchResponse = await fetch(`/api/users/first_name/${formSearch.firstname}/?page=${page.value}`, settingsGet);
         const data = await fetchResponse.json();
         users.splice(0);
         page = ref(1);
@@ -98,7 +98,7 @@ const searchByLastName = async (e) => {
     formSearch.firstname = ""
     formSearch.license = ""
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/users/last_name/total/${formSearch.lastname}`, settingsGet);
+        const fetchResponse = await fetch(`/api/users/last_name/total/${formSearch.lastname}`, settingsGet);
         const data = await fetchResponse.json();
 
         total.value = data.total
@@ -106,7 +106,7 @@ const searchByLastName = async (e) => {
         console.log(error);
     }
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/users/last_name/${formSearch.lastname}/?page=${page.value}`, settingsGet);
+        const fetchResponse = await fetch(`/api/users/last_name/${formSearch.lastname}/?page=${page.value}`, settingsGet);
         const data = await fetchResponse.json();
         users.splice(0);
         page = ref(1);
@@ -124,7 +124,7 @@ const searchByLicense = async (e) => {
     formSearch.firstname = ""
     formSearch.lastname = ""
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/user/license/total/${formSearch.license}`, settingsGet);
+        const fetchResponse = await fetch(`/api/user/license/total/${formSearch.license}`, settingsGet);
         const data = await fetchResponse.json();
 
         total.value = data.total
@@ -132,7 +132,7 @@ const searchByLicense = async (e) => {
         console.log(error);
     }
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/user/license/${formSearch.license}`, settingsGet);
+        const fetchResponse = await fetch(`/api/user/license/${formSearch.license}`, settingsGet);
         const data = await fetchResponse.json();
         users.splice(0);
         page = ref(1);
@@ -148,7 +148,7 @@ const previous = async (e) => {
     if(page.value > 1){
         page.value -= 1
         try {
-            const fetchResponse = await fetch(`https://localhost:443/api/users/?page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`/api/users/?page=${page.value}`, settingsGet);
             const data = await fetchResponse.json();
             users.splice(0);
             data.users.forEach(el => {
@@ -164,7 +164,7 @@ const next = async (e) => {
     if(page.value < (total.value / 3)){
         page.value += 1
         try {
-            const fetchResponse = await fetch(`https://localhost:443/api/users/?page=${page.value}`, settingsGet);
+            const fetchResponse = await fetch(`/api/users/?page=${page.value}`, settingsGet);
             const data = await fetchResponse.json();
               users.splice(0);
               data.users.forEach(el => {
@@ -207,7 +207,7 @@ const nextLastName = async (e) => {
 const getUser = async (id) => {
     page = ref(1);
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/user/${id}`, settingsGet);
+        const fetchResponse = await fetch(`/api/user/${id}`, settingsGet);
         const data = await fetchResponse.json();
 
         jsonUser.id = data.id;
@@ -247,7 +247,7 @@ const submitModif = async (id) => {
         )
     }
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/user/${id}`, settings);
+        const fetchResponse = await fetch(`/api/user/${id}`, settings);
         if(fetchResponse.status === 200){
                 alert("User modified!")
             }else if(fetchResponse.status === 400){
@@ -274,7 +274,7 @@ const deleteUser = async (id) => {
         },
     }
     try {
-        const fetchResponse = await fetch(`https://localhost:443/api/user/${id}`, settings);
+        const fetchResponse = await fetch(`/api/user/${id}`, settings);
         if(fetchResponse.status === 200){
                 alert("User deleted!")
             }else if(fetchResponse.status === 400){
