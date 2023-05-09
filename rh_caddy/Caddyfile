@@ -4,9 +4,7 @@ localhost {
     encode zstd gzip
     root * /srv/
     file_server
-    reverse_proxy /api/* backend:3300 {
-        trusted_proxies 172.20.0.0/14
-    }
+    reverse_proxy /api/* backend:3300
     basicauth {
         root $2a$14$5Kxi.TUqqJ1prPytMEscSOszZ3R0/j5dfTMQ9TqP6INDgusgmQ97y
     }
