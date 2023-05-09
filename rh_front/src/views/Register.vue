@@ -42,7 +42,12 @@ const registerVehicule = async () => {
             })
         }
         try {
-            const fetchResponse = await fetch("/api/users", settings);
+            const fetchResponse = await fetch("https://localhost:443/api/users", settings);
+            if(fetchResponse.status === 200){
+                alert("User added!")
+            }else{
+                alert("Something went wrong!")
+            }
             const data = await fetchResponse.json();
             
         } catch (e) {

@@ -247,8 +247,19 @@ const submitModif = async (id) => {
         )
     }
     try {
-        await fetch(`https://localhost:443/api/user/${id}`, settings);
-        await location.reload();
+        const fetchResponse = await fetch(`https://localhost:443/api/user/${id}`, settings);
+        if(fetchResponse.status === 200){
+                alert("User modified!")
+            }else if(fetchResponse.status === 400){
+                alert("Bad request! 400")
+            }else if(fetchResponse.status === 404){
+                alert("User not found 404")
+            }else if(fetchResponse.status === 404){
+                alert("Server error 500")
+            }else{
+                alert("Something went wrong!")
+            }
+        
     } catch (e) {
         console.log(e);
     }
@@ -263,8 +274,17 @@ const deleteUser = async (id) => {
         },
     }
     try {
-        await fetch(`https://localhost:443/api/user/${id}`, settings);
-        await location.reload();
+        const fetchResponse = await fetch(`https://localhost:443/api/user/${id}`, settings);
+        if(fetchResponse.status === 200){
+                alert("User deleted!")
+            }else if(fetchResponse.status === 400){
+                alert("Bad request! 400")
+            }else if(fetchResponse.status === 404){
+                alert("Server error 500")
+            }else{
+                alert("Something went wrong!")
+            }
+        
     } catch (e) {
         console.log(e);
     }
