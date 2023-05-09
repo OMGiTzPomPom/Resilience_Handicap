@@ -66,7 +66,7 @@ def capture():
                    
                     token = f.encrypt(text)
                     token = token.decode()
-                    r = requests.post("http://134.59.143.110:3300/parking", json={"plate": token})
+                    r = requests.post("http://134.59.143.110:3300/api/parking", json={"plate": token})
                     if r.status_code == 204:
                         print(r.json())
                     elif r.status_code == 404:
