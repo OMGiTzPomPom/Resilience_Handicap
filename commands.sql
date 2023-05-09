@@ -78,19 +78,19 @@ CREATE TABLE parking (
 ) ENGINE=InnoDB;
 
 INSERT INTO parking (number, area, is_disabled, plate) 
-VALUES ("1", "a", 0, "");
+VALUES ("0", "a", 0, "");
 
 INSERT INTO parking (number, area, is_disabled, plate) 
-VALUES ("2", "a", 1, "");
+VALUES ("1", "a", 1, "");
 
 INSERT INTO parking (number, area, is_disabled, plate) 
-VALUES ("1", "b", 0, "");
+VALUES ("0", "b", 0, "");
 
 INSERT INTO parking (number, area, is_disabled, plate) 
-VALUES ("2", "b", 1, "");
+VALUES ("1", "b", 1, "");
 
 INSERT INTO parking (number, area, is_disabled, plate) 
-VALUES ("1", "c", 0, "");
+VALUES ("0", "c", 0, "");
 
 INSERT INTO parking (number, area, is_disabled, plate) 
-VALUES ("2", "c", 1, "");
+VALUES ("1", "c", 1, "");

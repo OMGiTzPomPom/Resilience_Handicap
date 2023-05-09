@@ -5,8 +5,7 @@ localhost {
     }
     handle_path /api/* {
         uri strip_prefix /api
-        reverse_proxy backend:3300 {
-            header_down Strict-Transport-Security max-age=31536000;
-        }
+        reverse_proxy backend:3300
     }
+    respond "You are attempting to access protected resources!" 403
 }
