@@ -1,11 +1,31 @@
           
+          require("dotenv").config()
           const express = require('express')
           const swaggerDocument = require('./swagger.js');
           const swaggerUi = require('swagger-ui-express');
           const app = express()
+          const crypto = require('crypto');
+          // npm install mysql2
+          const mysql = require('mysql2/promise')
+          const cors = require('cors');
+          const basicAuth = require('express-basic-auth');
+          const fs = require('fs');
+
+          const sslOptions = {
+            cert: fs.readFileSync('client-cert.pem'),
+            key: fs.readFileSync('client-key.pem'),
+            rejectUnauthorized: false
+          };
+
+          app.use('/docs', basicAuth({
+            users: { 'root': 'root' },
+            challenge: true
+          }));
 
           app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-        
+
+
+
           const listPerPage = 3
 
           const db = {
@@ -22,9 +42,6 @@
           
 
 
-          // npm install mysql2
-          const mysql = require('mysql2/promise')
-          const cors = require('cors');
 
 
           app.use(cors())
@@ -39,7 +56,7 @@
            *     description: |
            *       Reserves a parking spot for the given license plate if the user is registered and has an active reservation.
            *     requestBody:
-           *       description: License plate number.
+           *       description: License plate number encrypted in aes-128-cbc as base64 format.
            *       required: true
            *       content:
            *         application/json:
@@ -58,46 +75,104 @@
            */
           app.post('/parking', async function (req, res, next) {
             try {
-              const { plate } = req.body
+             
+            const { plate } = req.body
+            const python_key = Buffer.from(process.env.KEY, "base64")
+            const encryptionKey = python_key.slice(16);
+            const decodedToken = Buffer.from(plate, 'base64');
+            
+            const version = decodedToken.readUInt8(0);
+            const timestamp = decodedToken.readBigUInt64BE(1);
+            const iv = decodedToken.slice(9, 25);
+            const ciphertext = decodedToken.slice(25, -32);
+            const hmacSignature = decodedToken.slice(-32);
+            const decipher = crypto.createDecipheriv('aes-128-cbc', encryptionKey, iv);
+            let decrypted = decipher.update(ciphertext);
+            decrypted += decipher.final();
+            console.log(decrypted.toString())
+             
+            let connection = await mysql.createConnection(db, {
+              host: 'localhost',
+              user: 'root',
+              password: 'root',
+              database: 'mydb',
+              ssl: sslOptions
+            })
+            let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [decrypted.toString(), decrypted.toString()])
+            if(rows.length > 0){
+              let current_date = Date.now();
+              let row = JSON.parse(JSON.stringify(rows[0]))
 
-              let connection = await mysql.createConnection(db)
-              let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [plate, plate])
-              if(rows.length > 0){
-                let current_date = Date.now();
-                let row = JSON.parse(JSON.stringify(rows[0]))
-  
-                if (new Date(row.until) >= current_date){
-                  const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
-  
-                  let [rows2, fields2] = await connection.query("SELECT number FROM `parking` WHERE `area` = ?", [area])
-  
-                  //if is_disabled
-                  if(row.is_disabled) {
+              if (new Date(row.until) >= current_date){
+                const area = row._days[new Date().toLocaleString('en-us', {  weekday: 'long' })]
+               
+     
+                if(row.is_disabled) {
+                  let [row, fields] = await connection.query("SELECT number FROM `parking` WHERE `area` = ? AND `is_disabled` = 1 AND `plate` = '' LIMIT 1", [area])
 
-                    if(rows2.length > 0){
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [1, area, plate])
-                    }else{
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [0, area, plate])
-                    }
-                  // if not is_disabled
-                  } else {
-                    if(rows2.length > 0){
-                      let i = 0;
-                      while (i < rows2.length) {i++}
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [i, area, plate])
-                    }else{
-                      await connection.execute('INSERT INTO parking (number, area, plate) VALUES (?,?,?)', [2, area, plate])
-                    }
+                  if(row.length > 0){
+                    const sql = 'UPDATE parking SET `plate` = ? WHERE `area` = ? AND `number` = ? AND `is_disabled` = 1'
+                    await connection.execute(sql, [decrypted.toString(), area, row[0].number])
                   }
-                  
+
+                } else {
+                  let [row, fields] = await connection.query("SELECT number FROM `parking` WHERE `area` = ? AND `is_disabled` = 0 AND `plate` = '' LIMIT 1", [area])
+
+                  if(row.length > 0){
+                    const sql = 'UPDATE parking SET `plate` = ? WHERE `area` = ? AND `number` = ? AND `is_disabled` = 0'
+                    await connection.execute(sql, [decrypted.toString(), area, row[0].number])
+                  }
                 }
+                
               }
-              return res.status(204).json({})
+            }
+            return res.status(204).json({})
             } catch (err) {
               next(err, req, res)
             }
           })
-          
+
+         /**
+         * @openapi
+         * /parking/{plate}:
+         *   patch:
+         *     summary: Patch a parking reservation.
+         *     description: |
+         *       Removes a parking spot for the given license plate.
+         *     parameters:
+         *       - name: plate
+         *         in: path
+         *         required: true
+         *         description: License plate number.
+         *         schema:
+         *           type: string
+         *     responses:
+         *       '204':
+         *         description: No content.
+         *       '400':
+         *         description: Bad request.
+         *       '500':
+         *         description: Internal server error.
+         */
+         app.patch('/parking/:plate', async function (req, res, next) {
+          try {
+            const { plate } = req.params
+            let connection = await mysql.createConnection(db, {
+              host: 'localhost',
+              user: 'root',
+              password: 'root',
+              database: 'mydb',
+              ssl: sslOptions
+            })
+            //if someone is leaving parking
+            const message = await connection.execute('UPDATE `parking` SET `plate` = ? WHERE `plate` = ?', ['', plate])
+            console.log(message);
+            return res.status(204).json({})
+          } catch (err) {
+            next(err, req, res)
+          }
+        })
+
         /**
          * @openapi
          * /parking/{plate}:
@@ -123,7 +198,13 @@
           app.delete('/parking/:plate', async function (req, res, next) {
             try {
               const { plate } = req.params
-              let connection = await mysql.createConnection(db)
+              let connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               //if someone is leaving parking
               const message = await connection.execute('DELETE FROM `parking` WHERE `plate` = ?', [plate])
               console.log(message);
@@ -132,6 +213,62 @@
               next(err, req, res)
             }
           })
+
+          /**
+           * @openapi
+           * /spot:
+           *   post:
+           *     summary: Add a new parking spot
+           *     description: Add a new spot to the system
+           *     requestBody:
+           *       required: true
+           *       content:
+           *         application/json:
+           *           schema:
+           *             type: object
+           *             properties:
+           *               number:
+           *                  type: string
+           *                  description: Parking number
+           *               area:
+           *                  type: string
+           *                  description: Parking area
+           *               disabled:
+           *                  type: integer
+           *                  description: Whether the spot is disabled (0 for no, 1 for yes)
+           *     responses:
+           *       200:
+           *         description: The newly added spot
+           *         content:
+           *           application/json:
+           *             schema:
+           *               type: object
+           *               properties:
+           *                 affectedRows:
+           *                   type: integer
+           *                   description: The number of affected rows
+           *                 insertId:
+           *                   type: integer
+           *                   description: The ID of the newly inserted spot
+           */
+          app.post('/spot', async function (req, res, next) {
+            try {
+              const { number, area, disabled } = req.body
+              const sql = 'INSERT INTO parking (number, area, is_disabled) VALUES (?,?,?)'
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
+              const [rows, fields] = await connection.execute(sql, [number, area, disabled])
+              return res.json(rows)
+            } catch (err) {
+              next(err, req, res)
+            }
+        })
+
           /**
            * @openapi
            * /spot:
@@ -151,7 +288,13 @@
            */
           app.get('/spot', async function (req, res, next) {
             try {
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.query("SELECT number, area FROM `parking` LIMIT 1")
               let row = JSON.parse(JSON.stringify(rows[0]))
               let string = ""
@@ -162,7 +305,7 @@
                 res.type('text/plain')
                 return res.send(string)
               }else{
-                return res.send({})
+                return res.send("")
               }
  
             } catch (err) {
@@ -197,9 +340,14 @@
            *                     type: object
            *                     properties:
            *                       number:
-           *                         type: integer
+           *                         type: string
+           *                         description: Parking number
            *                       area:
            *                         type: string
+           *                         description: Area for parking
+           *                       disabled:
+           *                         type: integer
+           *                         description: Whether the spot is for disabled (0 for no, 1 for yes)
            *                       plate:
            *                         type: string
            *                   description: A list of parking spots.
@@ -213,8 +361,14 @@
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
-              const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.query("SELECT number, area, plate FROM `parking` LIMIT ?,?", [ offset, 9])
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
+              const [rows, fields] = await connection.query("SELECT number, area, is_disabled, plate FROM `parking` LIMIT ?,?", [ offset, 9])
               return res.json({"parking":rows, page})
             } catch (err) {
               next(err, req, res)
@@ -244,7 +398,7 @@
            *                  type: string
            *                  description: Expiration date of the user's account
            *                  format: date
-           *               is_disabled:
+           *               disabled:
            *                  type: integer
            *                  description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -253,7 +407,7 @@
            *               license_2:
            *                  type: string
            *                  description: Second driver's license number
-           *               _days:
+           *               days:
            *                  type: object
            *                  description: Days of the week when the user is allowed to park
            *                  properties:
@@ -295,14 +449,7 @@
            */
           app.post('/users', async function (req, res, next) {
               try {
-                const {first_name, last_name, license_1, license_2, is_disabled, _days, until } = req.body
-
-                // console.log(req.body)
-
-                // license_1: 'ZE123ED'
-
-                // const test1 = license_1.slice(0, 1)
-
+                const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
                 for (let i = 0; i < license_1.length; i++) {
                      if ((i == 2 && license_1[i] === "O") || (i == 3 && license_1[i] === "O") || (i == 4 && license_1[i] === "O")){
                         license_1[i] = "0"
@@ -320,14 +467,18 @@
                   }
                 }
                 let license_2_mod = "NULL"
-                console.log(license_2.length);
                 if(license_2.length !== 0) {
                   license_2_mod = license_2
                 }
-                console.log(license_2_mod);
                 const sql = 'INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) VALUES (?,?,?,?,?,?,?)'
-                const connection = await mysql.createConnection(db)
-                const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, is_disabled, _days, until])
+                const connection = await mysql.createConnection(db, {
+                  host: 'localhost',
+                  user: 'root',
+                  password: 'root',
+                  database: 'mydb',
+                  ssl: sslOptions
+                })
+                const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, disabled, days, until])
                 return res.json(rows)
               } catch (err) {
                 next(err, req, res)
@@ -365,7 +516,7 @@
            *                 type: string
            *                 description: Expiration date of the user's account
            *                 format: date
-           *               is_disabled:
+           *               disabled:
            *                 type: integer
            *                 description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -374,7 +525,7 @@
            *               license_2:
            *                 type: string
            *                 description: Second driver's license number
-           *               _days:
+           *               days:
            *                 type: object
            *                 description: Days of the week when the user is allowed to park
            *                 properties:
@@ -420,7 +571,7 @@
            *                   type: string
            *                   description: Expiration date of the user's account
            *                   format: date
-           *                 is_disabled:
+           *                 disabled:
            *                   type: integer
            *                   description: Whether the user is disabled (0 for no, 1 for yes)
            *                 license_1:
@@ -429,7 +580,7 @@
            *                 license_2:
            *                   type: string
            *                   description: Second driver's license number
-           *                 _days:
+           *                 days:
            *                   type: object
            *                   description: Days of the week when the user is allowed to park
            *                   properties:
@@ -464,11 +615,21 @@
           app.put('/user/:id', async function (req, res, next) {
             try {
               const {id} = req.params
-              const {first_name, last_name, license_1, license_2, is_disabled, _days, until } = req.body
+              const {first_name, last_name, license_1, license_2, disabled, days, until } = req.body
               const sql = 'UPDATE users SET `first_name` = ?, `last_name` = ?, `license_1` = ?, `license_2` = ?, `is_disabled` = ?, `_days` = ?, `until` = ? WHERE `id` = ?'
 
-              const connection = await mysql.createConnection(db)
-              const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2, is_disabled, _days, until, id])
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
+              let license_2_mod = "NULL"
+              if(license_2.length !== 0) {
+                license_2_mod = license_2
+              }
+              const [rows, fields] = await connection.execute(sql, [first_name, last_name, license_1, license_2_mod, disabled, days, until, id])
               return res.json(rows[0])
             } catch (err) {
               next(err, req, res)
@@ -498,7 +659,13 @@
             try {
               const {id} = req.params
               const sql = 'DELETE FROM `users` WHERE `id` = ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.execute(sql, [id])
               return res.json(rows[0])
             } catch (err) {
@@ -543,7 +710,7 @@
            *                         type: string
            *                         description: Expiration date of the user's account
            *                         format: date
-           *                       is_disabled:
+           *                       disabled:
            *                         type: integer
            *                         description: Whether the user is disabled (0 for no, 1 for yes)
            *                       license_1:
@@ -552,7 +719,7 @@
            *                       license_2:
            *                         type: string
            *                         description: Second driver's license number
-           *                       _days:
+           *                       days:
            *                         type: object
            *                         description: Days of the week when the user is allowed to park
            *                         properties:
@@ -584,7 +751,13 @@
             try {
               const page = req.query.page ?? 1
               const offset = getOffset(page, listPerPage)
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` LIMIT ?,?"
               let [rows, fields] = await connection.query(sql, [offset, listPerPage])
               return res.json({"users":rows, page})
@@ -613,7 +786,13 @@
            */
           app.get('/users/total', async function (req, res, next) {
             try {
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let sql = "SELECT COUNT(users.id) AS total FROM `users`"
               let [rows, fields] = await connection.query(sql, [])
               return res.json({"total": rows[0].total})
@@ -656,7 +835,7 @@
            *                 type: string
            *                 description: Expiration date of the user's account
            *                 format: date
-           *               is_disabled:
+           *               disabled:
            *                 type: integer
            *                 description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -665,7 +844,7 @@
            *               license_2:
            *                 type: string
            *                 description: Second driver's license number
-           *               _days:
+           *               days:
            *                 type: object
            *                 description: Days of the week when the user is allowed to park
            *                 properties:
@@ -699,7 +878,13 @@
             try {
               const {id} = req.params
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `id` = ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.execute(sql, [id])
               if(rows.length > 0){
                 return res.json(rows[0])
@@ -744,7 +929,7 @@
            *                 type: string
            *                 description: Expiration date of the user's account
            *                 format: date
-           *               is_disabled:
+           *               disabled:
            *                 type: integer
            *                 description: Whether the user is disabled (0 for no, 1 for yes)
            *               license_1:
@@ -753,7 +938,7 @@
            *               license_2:
            *                 type: string
            *                 description: Second driver's license number
-           *               _days:
+           *               days:
            *                 type: object
            *                 description: Days of the week when the user is allowed to park
            *                 properties:
@@ -783,7 +968,13 @@
            */
           app.get('/user/license/:license', async function (req, res, next) {
             const {license} = req.params
-            const connection = await mysql.createConnection(db)
+            const connection = await mysql.createConnection(db, {
+              host: 'localhost',
+              user: 'root',
+              password: 'root',
+              database: 'mydb',
+              ssl: sslOptions
+            })
             let [rows, fields] = await connection.query("SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [license, license])
             if(rows.length > 0){
               return res.json(rows[0])
@@ -836,7 +1027,7 @@
            *                         type: string
            *                         description: Expiration date of the user's account
            *                         format: date
-           *                       is_disabled:
+           *                       disabled:
            *                         type: integer
            *                         description: Whether the user is disabled (0 for no, 1 for yes)
            *                       license_1:
@@ -845,7 +1036,7 @@
            *                       license_2:
            *                         type: string
            *                         description: Second driver's license number
-           *                       _days:
+           *                       days:
            *                         type: object
            *                         description: Days of the week when the user is allowed to park
            *                         properties:
@@ -882,7 +1073,13 @@
 
               const sql = 'SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `first_name` LIKE ? LIMIT ?,?'
 
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               const [rows, fields] = await connection.query(sql, [first_name + "%", offset, listPerPage])
               return res.json({"users": rows, page})
             } catch (err) {
@@ -920,7 +1117,13 @@
             try {
               const {first_name} = req.params
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `first_name` LIKE ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let [rows, fields] = await connection.query(sql, [first_name + "%"])
               return res.json({"total": rows[0].total})
             } catch (err) {
@@ -972,7 +1175,7 @@
            *                         type: string
            *                         description: Expiration date of the user's account
            *                         format: date
-           *                       is_disabled:
+           *                       disabled:
            *                         type: integer
            *                         description: Whether the user is disabled (0 for no, 1 for yes)
            *                       license_1:
@@ -981,7 +1184,7 @@
            *                       license_2:
            *                         type: string
            *                         description: Second driver's license number
-           *                       _days:
+           *                       days:
            *                         type: object
            *                         description: Days of the week when the user is allowed to park
            *                         properties:
@@ -1016,7 +1219,13 @@
               const offset = getOffset(page, listPerPage)
               const {last_name} = req.params
               let sql = "SELECT id, first_name, last_name, until, is_disabled, license_1, license_2, _days FROM `users` WHERE `last_name` LIKE ? LIMIT ?,?"
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let [rows, fields] = await connection.query(sql, [last_name + "%", offset, listPerPage])
               return res.json({"users":rows, page})
             } catch (err) {
@@ -1052,7 +1261,13 @@
             try {
               const {last_name} = req.params
               const sql = 'SELECT COUNT(users.id) AS total FROM `users` WHERE `last_name` LIKE ?'
-              const connection = await mysql.createConnection(db)
+              const connection = await mysql.createConnection(db, {
+                host: 'localhost',
+                user: 'root',
+                password: 'root',
+                database: 'mydb',
+                ssl: sslOptions
+              })
               let [rows, fields] = await connection.query(sql, [last_name + "%"])
               return res.json({"total": rows[0].total})
             } catch (err) {
@@ -1064,7 +1279,9 @@
           app.use((err, req, res, next) => {
             const statusCode = err.statusCode || 500;
             console.error(err.message, err.stack);
-            return res.status(statusCode).json({ message: err.message });
+            //for debugging
+            //return res.status(statusCode).json({ message: err.message });
+            return res.status(statusCode).json({});
           })
 
           app.listen(3300)

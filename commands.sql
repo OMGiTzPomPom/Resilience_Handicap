@@ -70,8 +70,27 @@ VALUES ("Adam", "Oumarov", "AD707Z0", "", 0, '{
 DROP TABLE IF EXISTS parking;
 CREATE TABLE parking (
     id BIGINT(10) AUTO_INCREMENT,
-    number TINYINT (1),
-    area VARCHAR (1) UNIQUE,
-    plate VARCHAR (7) UNIQUE,
+    number VARCHAR (255),
+    area VARCHAR (255),
+    is_disabled TINYINT (1),
+    plate VARCHAR (7) NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB;
+
+INSERT INTO parking (number, area, is_disabled, plate) 
+VALUES ("1", "a", 0, "");
+
+INSERT INTO parking (number, area, is_disabled, plate) 
+VALUES ("2", "a", 1, "");
+
+INSERT INTO parking (number, area, is_disabled, plate) 
+VALUES ("1", "b", 0, "");
+
+INSERT INTO parking (number, area, is_disabled, plate) 
+VALUES ("2", "b", 1, "");
+
+INSERT INTO parking (number, area, is_disabled, plate) 
+VALUES ("1", "c", 0, "");
+
+INSERT INTO parking (number, area, is_disabled, plate) 
+VALUES ("2", "c", 1, "");

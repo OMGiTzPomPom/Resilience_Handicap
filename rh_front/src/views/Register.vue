@@ -42,7 +42,7 @@ const registerVehicule = async () => {
             })
         }
         try {
-            const fetchResponse = await fetch("http://localhost:3300/users", settings);
+            const fetchResponse = await fetch("/api/users", settings);
             const data = await fetchResponse.json();
             
         } catch (e) {
