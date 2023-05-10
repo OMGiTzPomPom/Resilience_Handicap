@@ -68,8 +68,8 @@
            *     responses:
            *       '204':
            *         description: No content.
-           *       '400':
-           *         description: Bad request.
+           *       '404':
+           *         description: Not found.
            *       '500':
            *         description: Internal server error.
            */
@@ -202,7 +202,7 @@
          *   patch:
          *     summary: Patch a parking reservation.
          *     description: |
-         *       Removes a parking spot for the given license plate.
+         *       Patches a license plate.
          *     parameters:
          *       - name: plate
          *         in: path
@@ -213,8 +213,8 @@
          *     responses:
          *       '204':
          *         description: No content.
-         *       '400':
-         *         description: Bad request.
+         *       '404':
+         *         description: Not found.
          *       '500':
          *         description: Internal server error.
          */
@@ -254,8 +254,8 @@
          *     responses:
          *       '204':
          *         description: No content.
-         *       '400':
-         *         description: Bad request.
+         *       '404':
+         *         description: Not found.
          *       '500':
          *         description: Internal server error.
          */
