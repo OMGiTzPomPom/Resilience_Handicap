@@ -1,5 +1,5 @@
 localhost {
-    @deny not remote_ip 172.18.0.0/24
+    @deny not remote_ip 172.0.0.0/8
     respond @deny "Access Denied" 403
     encode zstd gzip
     root * /srv/
