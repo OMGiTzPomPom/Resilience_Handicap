@@ -50,7 +50,7 @@
 
           /**
            * @openapi
-           * /parking:
+           * /api/parking:
            *   post:
            *     summary: Reserve a parking spot.
            *     description: |
@@ -198,7 +198,7 @@
 
          /**
          * @openapi
-         * /parking/{plate}:
+         * /api/parking/{plate}:
          *   patch:
          *     summary: Patch a parking reservation.
          *     description: |
@@ -239,7 +239,7 @@
 
         /**
          * @openapi
-         * /parking/{plate}:
+         * /api/parking/{plate}:
          *   delete:
          *     summary: Remove a parking reservation.
          *     description: |
@@ -280,7 +280,7 @@
 
           /**
            * @openapi
-           * /spot:
+           * /api/spot:
            *   post:
            *     summary: Add a new parking spot
            *     description: Add a new spot to the system
@@ -335,7 +335,7 @@
 
           /**
            * @openapi
-           * /parking:
+           * /api/parking:
            *   get:
            *     summary: Get a list of parking spots
            *     description: Returns a list of parking spots with their respective numbers, areas, and license plate numbers.
@@ -397,7 +397,7 @@
 
           /**
            * @openapi
-           * /users:
+           * /api/users:
            *   post:
            *     summary: Add a new user
            *     description: Add a new user to the system
@@ -507,7 +507,7 @@
 
           /**
            * @openapi
-           * /user/{id}:
+           * /api/user/{id}:
            *   put:
            *     summary: Update a user by ID
            *     description: Update a user using their ID
@@ -658,7 +658,7 @@
 
           /**
            * @openapi
-           * /user/{id}:
+           * /api/user/{id}:
            *   delete:
            *     summary: Delete a user by ID
            *     description: Deletes a user from the database by ID
@@ -695,7 +695,7 @@
 
           /**
            * @openapi
-           * /users:
+           * /api/users:
            *   get:
            *     summary: Get a list of users.
            *     parameters:
@@ -788,7 +788,7 @@
 
           /**
            * @openapi
-           * /users/total:
+           * /api/users/total:
            *   get:
            *     summary: Get the total number of users.
            *     description: Returns the total number of users.
@@ -823,7 +823,7 @@
 
           /**
            * @openapi
-           * /user/{id}:
+           * /api/user/{id}:
            *   get:
            *     summary: Get a user by ID.
            *     description: Returns the user with the specified ID.
@@ -918,7 +918,7 @@
 
           /**
            * @openapi
-           * /user/license/{license}:
+           * /api/user/license/{license}:
            *   get:
            *     summary: Get user information by license number
            *     parameters:
@@ -1006,7 +1006,7 @@
 
           /**
            * @openapi
-           * /users/first_name/{first_name}:
+           * /api/users/first_name/{first_name}:
            *   get:
            *     summary: Get a list of users by first name
            *     parameters:
@@ -1110,7 +1110,7 @@
 
           /**
            * @openapi
-           * /users/first_name/total/{first_name}:
+           * /api/users/first_name/total/{first_name}:
            *   get:
            *     summary: Get the total count of users by first name
            *     parameters:
@@ -1154,7 +1154,7 @@
 
           /**
            * @openapi
-           * /users/last_name/{last_name}:
+           * /api/users/last_name/{last_name}:
            *   get:
            *     summary: Get a list of users by last name
            *     parameters:
@@ -1256,7 +1256,7 @@
 
           /**
            * @openapi
-           * /users/last_name/total/{last_name}:
+           * /api/users/last_name/total/{last_name}:
            *   get:
            *     summary: Get the total number of users with a certain last name.
            *     parameters:
