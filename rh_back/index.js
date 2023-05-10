@@ -77,6 +77,7 @@
             try {
              
             const { plate } = req.body
+            console.log(plate);
             const python_key = Buffer.from(process.env.KEY, "base64")
             const encryptionKey = python_key.slice(16);
             const decodedToken = Buffer.from(plate, 'base64');
@@ -89,7 +90,7 @@
             const decipher = crypto.createDecipheriv('aes-128-cbc', encryptionKey, iv);
             let decrypted = decipher.update(ciphertext);
             decrypted += decipher.final();
-            console.log(decrypted.toString())
+           
              
             let connection = await mysql.createConnection(db, {
               host: 'localhost',
@@ -98,6 +99,7 @@
               database: 'mydb',
               ssl: sslOptions
             })
+          
             let [rows, fields] = await connection.query("SELECT id, until, is_disabled, _days FROM `users` WHERE `license_1` = ? OR `license_2` = ?", [decrypted.toString(), decrypted.toString()])
 
             if(rows.length > 0){
