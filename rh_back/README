@@ -1,2 +1,1 @@
-This API is for managing users and parking places.
-It has registered users 
+This API provides a set of endpoints for managing parking spots and users in a web-based application. It allows users to reserve and update parking spots, and administrators to add and manage parking spots and user accounts. The API also provides various endpoints for retrieving user information based on license number, first name, and last name. This API can be used to create a parking management system for organizations such as shopping malls, universities, and airports.
