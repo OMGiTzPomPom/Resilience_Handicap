@@ -120,27 +120,21 @@ const searchByLastName = async (e) => {
 
 const searchByLicense = async (e) => {
     if(formSearch.license === "") return getAllUsers()
-    page = ref(1);
     formSearch.firstname = ""
     formSearch.lastname = ""
-    try {
-        const fetchResponse = await fetch(`/api/user/license/total/${formSearch.license}`, settingsGet);
-        const data = await fetchResponse.json();
-
-        total.value = data.total
-    } catch (error) {
-        console.log(error);
-    }
-    try {
-        const fetchResponse = await fetch(`/api/user/license/${formSearch.license}`, settingsGet);
-        const data = await fetchResponse.json();
-        users.splice(0);
+    if(formSearch.license.length === 7){
         page = ref(1);
-        return data.users.forEach(el => {
-            users.push(el)
-        })
-    } catch (error) {
-        console.log(error);
+        try {
+            const fetchResponse = await fetch(`/api/user/license/${formSearch.license}`, settingsGet);
+            const data = await fetchResponse.json();
+            users.splice(0);
+            page = ref(1);
+            return data.users.forEach(el => {
+                users.push(el)
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 
