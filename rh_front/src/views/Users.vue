@@ -122,14 +122,16 @@ const searchByLicense = async (e) => {
     if(formSearch.license === "") return getAllUsers()
     formSearch.firstname = ""
     formSearch.lastname = ""
+    page = ref(1);
     if(formSearch.license.length === 7){
-        page = ref(1);
         try {
             const fetchResponse = await fetch(`/api/user/license/${formSearch.license}`, settingsGet);
             const data = await fetchResponse.json();
             users.splice(0);
             page = ref(1);
-            users.push(data)
+            if(Object.keys(data).length > 0){
+                users.push(data)
+            }
             return users
         } catch (error) {
             console.log(error);
