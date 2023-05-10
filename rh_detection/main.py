@@ -1,4 +1,5 @@
 import cv2
+cv2.ocl.setUseOpenCL(False)
 import numpy
 import pytesseract
 import os
