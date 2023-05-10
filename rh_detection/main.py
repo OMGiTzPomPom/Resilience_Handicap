@@ -49,7 +49,6 @@ def capture():
             if os.path.exists("/home/iut/test.jpg"):
                 carplate_extract_img = carplate_extract(frame)
                 carplate_extract_img = enlarge_img(carplate_extract_img, 150)
-                cv2.imshow("video", carplate_extract_img)
                 imgchar = pytesseract.image_to_string(carplate_extract_img, lang = 'eng', config = '--oem 3 --psm 6')
                 text = "".join(imgchar.split())
                 text = text.replace("-","").replace(">>","").replace("|","").replace("*","").replace("]","").replace(")","").replace("}","").replace("!","").replace(",","").replace(":","").replace(".","")
@@ -93,6 +92,7 @@ def run_camera():
         previous = current
         try:
             _, frame = webcam.read()
+            cv2.imshow("video", frame)
             cv2.waitKey(1)
             if delta > 3:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
