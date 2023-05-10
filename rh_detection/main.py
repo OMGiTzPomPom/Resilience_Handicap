@@ -47,9 +47,10 @@ def capture():
             frame = cv2.imread(r"/home/iut/test.jpg")
             carplate_extract_img = carplate_extract(frame)
             carplate_extract_img = enlarge_img(carplate_extract_img, 150)
+            cv2.imshow("video", carplate_extract_img)
             imgchar = pytesseract.image_to_string(carplate_extract_img, lang = 'eng', config = '--oem 3 --psm 6')
             text = "".join(imgchar.split())
-            text = text.replace("-","").replace(">>","").replace("|","").replace("*","").replace("]","").replace(")","").replace("}","")
+            text = text.replace("-","").replace(">>","").replace("|","").replace("*","").replace("]","").replace(")","").replace("}","").replace("!","").replace(",","").replace(":","").replace(".","")
             print(text)
             if len(text) == 7:
                 # AB 777 CD
@@ -89,8 +90,6 @@ def run_camera():
         try:
             _, frame = webcam.read()
             cv2.waitKey(1)
-            cv2.resize(frame, (600,400))
-            cv2.imshow("video", frame)
             if delta > 3:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 frame = cv2.medianBlur(frame, 3)
