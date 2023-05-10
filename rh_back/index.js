@@ -985,7 +985,8 @@
            *         description: User not found
            */
           app.get('/api/user/license/:license', async function (req, res, next) {
-            const {license} = req.params
+            let {license} = req.params
+            license = license.toUpperCase()
             const connection = await mysql.createConnection(db, {
               host: 'localhost',
               user: 'root',
