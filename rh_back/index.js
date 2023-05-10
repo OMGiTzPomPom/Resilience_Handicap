@@ -128,8 +128,6 @@
                             }
                         };
                         const req = http.request(options, (res) => {
-                          console.log(`statusCode: ${res.statusCode}`);
- 
                           res.on('data', function (data) {
                             process.stdout.write(data)
                 
@@ -170,7 +168,7 @@
                       }
                   };
                         const req = http.request(options, (res) => {
-                          console.log(`statusCode: ${res.statusCode}`);
+              
  
                           res.on('data', function (data) {
                             process.stdout.write(data)
@@ -909,7 +907,7 @@
               if(rows.length > 0){
                 return res.json(rows[0])
               }else{
-                return res.statusCode(404).json({})
+                return res.status(404).json({})
               }
             } catch (err) {
               next(err, req, res)
@@ -999,7 +997,7 @@
             if(rows.length > 0){
               return res.json(rows[0])
             }else{
-              return res.statusCode(404).json({})
+              return res.status(404).json({})
             }
           })
 
