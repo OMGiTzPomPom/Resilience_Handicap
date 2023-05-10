@@ -1,6 +1,11 @@
           
           require("dotenv").config()
           const http = require('http');
+          //const https = require('https');
+          // const options = {
+          //   key: fs.readFileSync('/path/to/private.key'),
+          //   cert: fs.readFileSync('/path/to/certificate.crt')
+          // };
           const express = require('express')
           const swaggerDocument = require('./swagger.js');
           const swaggerUi = require('swagger-ui-express');
@@ -1306,3 +1311,8 @@
           })
 
           app.listen(3300)
+
+          // const server = https.createServer(options, app);
+          // server.listen(443, () => {
+          //   console.log('Server listening on port 443');
+          // });
