@@ -129,9 +129,8 @@ const searchByLicense = async (e) => {
             const data = await fetchResponse.json();
             users.splice(0);
             page = ref(1);
-            return data.users.forEach(el => {
-                users.push(el)
-            })
+            users.push(data)
+            return users
         } catch (error) {
             console.log(error);
         }
