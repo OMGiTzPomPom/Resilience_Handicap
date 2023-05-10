@@ -45,38 +45,41 @@ def capture():
     while 1:
         try:
             frame = cv2.imread(r"/home/iut/test.jpg")
-            carplate_extract_img = carplate_extract(frame)
-            carplate_extract_img = enlarge_img(carplate_extract_img, 150)
-            cv2.imshow("video", carplate_extract_img)
-            imgchar = pytesseract.image_to_string(carplate_extract_img, lang = 'eng', config = '--oem 3 --psm 6')
-            text = "".join(imgchar.split())
-            text = text.replace("-","").replace(">>","").replace("|","").replace("*","").replace("]","").replace(")","").replace("}","").replace("!","").replace(",","").replace(":","").replace(".","")
-            print(text)
-            if len(text) == 7:
-                # AB 777 CD
+            if os.path.exists("/home/iut/test.jpg"):
+                carplate_extract_img = carplate_extract(frame)
+                carplate_extract_img = enlarge_img(carplate_extract_img, 150)
+                cv2.imshow("video", carplate_extract_img)
+                imgchar = pytesseract.image_to_string(carplate_extract_img, lang = 'eng', config = '--oem 3 --psm 6')
+                text = "".join(imgchar.split())
+                text = text.replace("-","").replace(">>","").replace("|","").replace("*","").replace("]","").replace(")","").replace("}","").replace("!","").replace(",","").replace(":","").replace(".","")
                 i = 0
                 for letter in text:
+                    if letter == "-":
+                        text = text.replace(letter, "")
                     if i == 2 and letter == "O" or i == 3 and letter == "O" or i == 4 and letter == "O":
                         text = text.replace(letter, "0")
                     if i == 0 and letter == "0" or i == 1 and letter == "0" or i == 5 and letter == "0" or i == 6 and letter == "0":
                         text = text.replace(letter, "O")
                     i+=1
-                #r = requests.get("https://agilenegativemiddleware.extremety1989.repl.co/user/license/"+text)
-                try:
-                    text = text.encode("UTF-8")
-                   
-                    token = f.encrypt(text)
-                    token = token.decode()
-                    r = requests.post("http://134.59.143.110:3300/api/parking", json={"plate": token})
-                    if r.status_code == 204:
-                        print(r.json())
-                    elif r.status_code == 404:
-                        print("not found")
-                    else:
-                        print(r.status_code)
-                        print(r.json())
-                except requests.exceptions.ConnectionError:
-                    print("Connection refused")
+                if len(text) == 7:
+                    # AB 777 CD
+                    print(text)
+                    #r = requests.get("https://agilenegativemiddleware.extremety1989.repl.co/user/license/"+text)
+                    try:
+                        text = text.encode("UTF-8")
+                    
+                        token = f.encrypt(text)
+                        token = token.decode()
+                        r = requests.post("http://134.59.143.110:3300/api/parking", json={"plate": token})
+                        if r.status_code == 204:
+                            print(r.json())
+                        elif r.status_code == 404:
+                            print("not found")
+                        else:
+                            print(r.status_code)
+                            print(r.json())
+                    except requests.exceptions.ConnectionError:
+                        print("Connection refused")
         except:
             pass
 
