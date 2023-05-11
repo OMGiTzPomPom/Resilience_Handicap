@@ -12,7 +12,7 @@ CREATE TABLE users (
 ) ENGINE=InnoDB;
 
 INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) 
-VALUES ("John", "Doe", "AED44Z2", "", 0, '{
+VALUES ("John", "Doe", "AE444IJ", "", 0, '{
     "Monday": "a",
     "Tuesday": "b",
     "Wednesday": "b",
@@ -23,7 +23,7 @@ VALUES ("John", "Doe", "AED44Z2", "", 0, '{
 }', "2024-12-28");
 
 INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) 
-VALUES ("Pauline", "Srifi", "DD301A4", "JNBCG08", 1, '{
+VALUES ("Pauline", "Srifi", "DD301OP", "JN457DE", 1, '{
     "Monday": "a",
     "Tuesday": "b",
     "Wednesday": "b",
@@ -45,7 +45,7 @@ VALUES ("Andranik", "Arakelov", "AE407RB", "", 0, '{
 }', "2024-12-28");
 
 INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) 
-VALUES ("Baptiste", "Bilebault", "G8ADS88", "", 0, '{
+VALUES ("Baptiste", "Bilebault", "GS854SS", "", 0, '{
     "Monday": "a",
     "Tuesday": "b",
     "Wednesday": "b",
@@ -56,7 +56,7 @@ VALUES ("Baptiste", "Bilebault", "G8ADS88", "", 0, '{
 }', "2024-12-28");
 
 INSERT INTO users (first_name, last_name, license_1, license_2, is_disabled, _days, until) 
-VALUES ("Adam", "Oumarov", "AD707Z0", "", 0, '{
+VALUES ("Adam", "Oumarov", "AD707ZO", "", 0, '{
     "Monday": "a",
     "Tuesday": "b",
     "Wednesday": "b",
