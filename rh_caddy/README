@@ -1,0 +1,5 @@
+for remote_ip i use 172.20.0.0/14 because
+
+uses ip address of WSL (because of docker)
+so i need to look at Carte Ethernet vEthernet (WSL) Adresse IPv4
+else in Carte Ethernet Ethernet Adresse IPv4 for local network

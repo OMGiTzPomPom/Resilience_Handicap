@@ -1,0 +1,97 @@
+$white: #fff;
+$gray-100: #fafafa;
+$gray-200: #F9F8FC;
+$gray-300: #EDEDED;
+$gray-400: #cbc8d0;
+$gray-500: #adb5bd;
+$gray-600: #868e96;
+$gray-700: #444;
+$gray-800: #343a40;
+$gray-900: #17141F;
+$black: #000;
+$blue: #007bff;
+$indigo: #6610f2;
+$purple: #593196;
+$pink: #e83e8c;
+$red: #FC3939;
+$orange: #E96B1D;
+$yellow: #EFA31D;
+$green: #41B92E;
+$teal: #20c997;
+$cyan: #009CDC;
+/*BS*/
+$primary: #3d25eb;
+$secondary: #9b6fe8;
+$success: #149e5e;
+$info: #64646d;
+$warning: #dfca15;
+$danger: #ec2209;
+$light: #d8e4fc;
+$dark: #000006;
+/*BS*/
+$body-color: $gray-700;
+$dropdown-link-color: $gray-700;
+$dropdown-link-hover-color: $white;
+$dropdown-link-hover-bg: $primary;
+$navbar-dark-hover-color: rgba($white, .9);
+
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+$utilities: map-merge(
+                $utilities,
+                (
+                        "width": (
+                                property: width,
+                                class: w,
+                                values: (
+                                        month: 8.33%,
+                                        results: 6.77%,
+                                        5: 5%,
+                                        10: 10%,
+                                        12: 12%,
+                                        15: 15%,
+                                        20: 20%,
+                                        25: 25%,
+                                        30: 30%,
+                                        40: 40%,
+                                        50: 50%,
+                                        60: 60%,
+                                        70: 70%,
+                                        75: 75%,
+                                        80: 80%,
+                                        90: 90%,
+                                        100: 100%,
+                                        auto: auto
+                                )
+                        ),
+                        "max-width": (
+                                property: max-width,
+                                class: mw,
+                                values: (
+                                        10: 10%,
+                                        15: 15%,
+                                        20: 20%,
+                                        25: 25%,
+                                        30: 30%,
+                                        40: 40%,
+                                        50: 50%,
+                                        60: 60%,
+                                        70: 70%,
+                                        75: 75%,
+                                        80: 80%,
+                                        90: 90%,
+                                        100: 100%
+                                )
+                        ),
+                )
+);
+
+//Fixed Width
+@import "bootstrap/scss/utilities/api";
+
+// Bootstrap main import
+@import "../node_modules/bootstrap/scss/bootstrap";
